@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/normalize.css">
+  <link rel="stylesheet" href="/assets/css/ockham.css">
+  <script async src="/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> Harekaze mini CTF 2021 </title>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/about/" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+      <li">
+        <a href="/archive/" class="sidebar-nav-item ">
+          archive
+        </a>
+      </li>
+    
+      <li">
+        <a href="/categories/" class="sidebar-nav-item ">
+          categories
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">Harekaze mini CTF 2021</h1>
+  <div class="post-meta">
+    <time datetime="2021-12-24T00:00:00+00:00" itemprop="datePublished">
+      24 Dec 2021
+    </time></div>
+
+  <table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Challenge Name</strong></th>
+      <th style="text-align: center">Tags</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><a href="#first-exam">first exam</a></td>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">xor</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><a href="#sage-training">sage training</a></td>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">matrix</code> <code class="language-plaintext highlighter-rouge">rsa</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><a href="#mulmulmulti-prime-rsa">mulmulmulti-prime RSA</a></td>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">rsa</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><a href="#lost-key">lost key</a></td>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">rsa</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="first-exam">first exam</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">random</span> 
+<span class="kn">from</span> <span class="nn">flag</span> <span class="kn">import</span> <span class="n">flag</span> 
+<span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span><span class="p">,</span> <span class="n">bytes_to_long</span>
+
+<span class="n">flag</span> <span class="o">=</span> <span class="n">base64</span><span class="p">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+<span class="n">flag</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randrange</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+<span class="n">flag</span> <span class="o">=</span> <span class="n">flag</span> <span class="o">^</span> <span class="n">key</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">key</span> <span class="o">=</span> <span class="si">}</span><span class="s">"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">flag</span> <span class="o">=</span> <span class="si">}</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="solution">solution</h2>
+
+<p>Observe that we get both the key and the flag XORed with the key. We can therefore solve this if we take the inverse of XOR, but since XOR is <strong>self-inverse</strong>, the inverse of XOR is XOR itself.</p>
+
+<p>Therefore, if we XOR the key with the flag, we should get the original flag.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span>
+<span class="n">key</span> <span class="o">=</span> <span class="mi">407773567691797768945309646881381330143924911048532252374484400956007416406007936505301187512369384531883020224488253602523154102140950477859193</span>
+<span class="n">flag</span> <span class="o">=</span> <span class="mi">1392812161183976577227166142672085037819799462496681473937900208451109718213256601589927195482395914799893761610554140977947503369343069077952836</span>
+<span class="k">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="n">key</span> <span class="o">^</span> <span class="n">flag</span><span class="p">))</span>
+<span class="c1"># HarekazeCTF{OK_you_can_join_wizardry_school}
+</span></code></pre></div></div>
+
+<h4 id="flag-harekazectfok_you_can_join_wizardry_school">Flag: <code class="language-plaintext highlighter-rouge">HarekazeCTF{OK_you_can_join_wizardry_school}</code></h4>
+
+<h1 id="sage-training">sage training</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">flag</span> <span class="kn">import</span> <span class="n">flag</span>
+
+<span class="n">flag</span> <span class="o">=</span> <span class="n">flag</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+<span class="n">flag</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">getStrongPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">getStrongPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">p</span><span class="o">*</span><span class="n">q</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">(</span><span class="n">Zmod</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="p">[</span>
+    <span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">flag</span><span class="p">]</span>
+<span class="p">])</span>
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="o">^</span><span class="n">e</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"c ="</span><span class="p">,</span><span class="nb">list</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"n ="</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"e ="</span><span class="p">,</span><span class="n">e</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The matrix $m$</p>
+
+\[m = \begin{bmatrix}
+p &amp; 0\\
+0 &amp; flag\\
+\end{bmatrix}\]
+
+<p>over $(\mathbb Z/n\mathbb Z)^*$ (basically, we take $\mod n$ for each element)  is formed and then raised to the power of $e = 65537$.</p>
+
+<h2 id="solution-1">solution</h2>
+
+<p>Recall that matrix multiplication of a 2x2 matrix ends up as:</p>
+
+\[\begin{bmatrix}
+a &amp; b\\
+c &amp; d\\
+\end{bmatrix}
+\begin{bmatrix}
+e &amp; f\\
+g &amp; h\\
+\end{bmatrix}= 
+\begin{bmatrix}
+ae + bg &amp; af + bh\\
+ce + dg &amp; cf + dh\\
+\end{bmatrix}\]
+
+<p>If we replace $b, c, f$ and $g$ with 0, this becomes:</p>
+
+\[\begin{bmatrix}
+a &amp; 0\\
+0 &amp; d\\
+\end{bmatrix}
+\begin{bmatrix}
+e &amp; 0\\
+0 &amp; h\\
+\end{bmatrix}= 
+\begin{bmatrix}
+ae + 0 &amp; 0 + 0\\
+0 + 0 &amp; 0 + dh\\
+\end{bmatrix}
+= 
+\begin{bmatrix}
+ae &amp; 0\\
+0 &amp; dh\\
+\end{bmatrix}\]
+
+<p>Observe that then the top left element is equal to the product of the top left elements in all matrices, and the bottom right element is equal to the product of the bottom right elements in all of the matrices.</p>
+
+<p>So, if we were to take the product of $e$ of the same matrix (exponentiation, like in the challenge!), we would get</p>
+
+\[m^e = \begin{bmatrix}
+p^e &amp; 0\\
+0 &amp; flag^e\\
+\end{bmatrix}\]
+
+<p>We know that $c$ is equal to this value, how does this help us? Well, the encryption is very similar to RSA, so it might be a good idea to factor $n$ first.</p>
+
+<p>How can we factor $n$ given $p^e \mod n$? Since $p$ is a factor of $n$, raising $p$ to the power of anything will always result in another multiple of $p$. Therefore, we can use the <a href="https://en.wikipedia.org/wiki/Greatest_common_divisor">greatest common divisor</a> algorithm to find $p$ and factor $n$.</p>
+
+<p>We have $flag^e \mod n$ from the bottom right element of $c$, and we can factor  $n$, so the rest is just standard RSA.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">gcd</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">94705679004463284733541288053549635663983624426348082883911423652044420589882644740030824857964094373277293351421545117172457918484063609288563394969114856228940330220982203798491227942337707868513380987219942847139213839127934175216087451584996193094098370176337671205679032479708240220775365041028562298045</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14243811671300968907609174458855708829741032120754409000357686908873126315334915231420353855815283498571171729689334442024813021199910238276500626386134036150649025606319036019223959715867658461585221634071508142818645594816357236002650041503442624594820852244903155433016041077813314542285538820574629698950</span><span class="p">)]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">123658273021758657244926229590842169697216202161458868027271307824674005278002104678607018762498569110790554844101479136721968081586766904446085438475258864812618061595487772978115460674609635002737826341845366713797429237465562629770189347062332559337703309881797723858775511801114681134013841432780549606609</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">n</span> <span class="o">//</span> <span class="n">p</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">phi</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span><span class="p">)))</span>
+<span class="c1"># HarekazeCTF{which_do_you_like_mage_or_sage?}
+</span></code></pre></div></div>
+
+<h4 id="flag-harekazectfwhich_do_you_like_mage_or_sage">Flag: <code class="language-plaintext highlighter-rouge">HarekazeCTF{which_do_you_like_mage_or_sage?}</code></h4>
+
+<h1 id="mulmulmulti-prime-rsa">mulmulmulti-prime rsa</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sympy.ntheory.modular</span> <span class="kn">import</span> <span class="n">crt</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Crypto.Random.random</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">flag</span> <span class="kn">import</span> <span class="n">flag</span>
+
+<span class="n">flag</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">num</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="k">while</span> <span class="n">N</span> <span class="o">&lt;</span> <span class="n">flag</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+        <span class="n">N</span> <span class="o">*=</span> <span class="n">num</span>
+    <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">getStrongPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">getStrongPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span>
+<span class="n">c</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"bit_length ="</span><span class="p">,</span> <span class="n">flag</span><span class="p">.</span><span class="n">bit_length</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"c ="</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"e ="</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"N ="</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The modulus $n$ is composed of two 512 bit primes, along with a suspiciously generated value $s$ composed of multiplying many small primes together. We are also given the bit length of $flag$.</p>
+
+<h2 id="solution-2">solution</h2>
+
+<p>Notice that $s$ has many many small factors, and we know that $s$ is a factor of $n$ as well as being larger than the flag, so what we can effectively do in this case is work mod $s$. We’ll find $s$ by just chucking $n$ into <a href="http://factordb.com/index.php?query=13105434584967797009222723925714056612973229654650200307281518067540513311350491750775580308761120670043385919352137451528084580772272083564644136982142743585238409901075466075590932718136237274538943262152033321299508243379729042658808185056276914453786554308920681089647171956781340126500826872053436182017911021212882822071757885385543985492728290224139575551494811781675324350095354476279621406379090030101147754502075514438702852559140941288066281245455568260855730">FactorDB</a>, to get a value of</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>N = 101711813138816844924236837117014535397962326595284001750280202679841694874264008030110521904988877540733288496933299638087626005351064797010220112569797363528290
+</code></pre></div></div>
+
+<p>Finally, we’ll do normal RSA decryption mod $s$, the only thing we need to watch out for is that we calculate the totient correctly. <del>Luckily, we can just use sage’s builtin <code class="language-plaintext highlighter-rouge">euler_totient</code> function to do all the work for us</del>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span>
+
+<span class="n">bit_length</span> <span class="o">=</span> <span class="mi">535</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mi">6444384937952479446360543800306726693252997452825552613901755375099255166714791921303820142603050845604453415771813934605436773362180219243666255359716995456217503120584807127945079526447091871683834669804927783277541340212953733681665967741288390917442432418885663222080013261671274096066346531406665749671823431928515791704387207382571496076159703188939522942673142857854899106254676400171188528066441584894129954980506317784944539407501773216256651827692873203651175</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">13105434584967797009222723925714056612973229654650200307281518067540513311350491750775580308761120670043385919352137451528084580772272083564644136982142743585238409901075466075590932718136237274538943262152033321299508243379729042658808185056276914453786554308920681089647171956781340126500826872053436182017911021212882822071757885385543985492728290224139575551494811781675324350095354476279621406379090030101147754502075514438702852559140941288066281245455568260855730</span>
+<span class="n">s</span> <span class="o">=</span> <span class="mi">101711813138816844924236837117014535397962326595284001750280202679841694874264008030110521904988877540733288496933299638087626005351064797010220112569797363528290</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="n">euler_totient</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">d</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">s</span><span class="p">)))</span>
+<span class="c1"># HarekazeCTF{Small_prime_numbers_give_a_large_amount_of_information}
+</span></code></pre></div></div>
+
+<h4 id="flag-harekazectfsmall_prime_numbers_give_a_large_amount_of_information">Flag: <code class="language-plaintext highlighter-rouge">HarekazeCTF{Small_prime_numbers_give_a_large_amount_of_information}</code></h4>
+
+<h1 id="lost-key">lost key</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">flag</span> <span class="kn">import</span> <span class="n">flag</span>
+
+<span class="k">assert</span> <span class="n">flag</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">'HarekazeCTF{'</span><span class="p">)</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">getStrongPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">getStrongPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">p</span><span class="o">*</span><span class="n">q</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"e ="</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+<span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">flag</span><span class="p">:</span>
+    <span class="n">out</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="nb">ord</span><span class="p">(</span><span class="n">char</span><span class="p">),</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"cs ="</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The flag is encrypted byte by byte using normal RSA with an exponent of 65537. Additionally, we are told that the flag begins with <code class="language-plaintext highlighter-rouge">HarekazeCTF{</code>. We are not given the public modulus $n$ however.</p>
+
+<h2 id="solution-3">solution</h2>
+
+<p>There’s a pretty obvious flaw here that the flag is encrypted byte by byte, meaning there are only a very small number of values that this character can be, so if we had the modulus $n$, we could simply try all values for the byte until we get the message byte $m_i$ where $m_i^e = c_i$ .</p>
+
+<p>However, we don’t know the modulus, so clearly there must be some way to recover it.</p>
+
+<p>Consider the first byte of the message, $m_0$ and the corresponding ciphertext output $c_0$. We know that:</p>
+
+\[m_0 ^ e = c_0 \mod n\\\]
+
+<p>therefore removing the mod $n$</p>
+
+\[m_0^e = kn + c_0\\
+m_0^e - c_0 = kn\]
+
+<p>which leaves us with a multiple of $n$. While we may not be able to feasibly factor this multiple of $n$ to get $n$, we can repeat this with the next byte to get another multiple of $n$. After this, we can once again take the greatest common divisor and we should hopefully get either $n$ or a very small factor multiplied by $n$, which we should be able to factor out.</p>
+
+<p>After this, we can use the method above to brute byte by byte and recover the whole flag.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">gcd</span>
+
+<span class="n">e</span> <span class="o">=</span> <span class="mi">65537</span>
+<span class="n">cs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">107466974184702145841553115319664339451930120354255273379558301545144507867522177692766159895259859624597019715005555797296886281889980929155335051650180549267089493842162874438089885015009176408334472291993521164651083717243958338826627907485117225058962936487939446771769736790338807986944156168183749925840</span><span class="p">,</span> <span class="mi">22170132985413848490531783256781545736605099405646311268035819648933711512452780485867743670267230573816424442101847710685057703148406327241405695594207932241067458449670531595183417759103156231396266753674309067947713122567002400734977976535077517990037756703231259947021113899161279426849577708990870731796</span><span class="p">,</span> <span class="mi">53663607942106145324856505634900952366446957335671164130522298044915630458145599229549689140621749659760530223576029477516300914481873420175142570078712350791717712867102285434801786722800007966464203566632283618002607953903231805867079414136989142782468226938194605757261613478374151072690376532757078133321</span><span class="p">,</span> <span class="mi">78365694503332388406635946375239888121420777373504294295865419461438621745194084475076351926821762908738314158329198338224524128225720604464503818477193486444917215723917379663727939853085907074473084404201033606252087766780407179445044519351567149421025751850087276632425870891542111663028730543465980924674</span><span class="p">,</span> <span class="mi">39567326944456595185852131549239713048406760014375723185889668137264862184400625209347132385346771952845648844528249396652730647892825213067744420896877172327145941557401152582745524351689936262218846212578493068131068289265309178184007416700486534305431585962239171245639859026914854729185183441536829994448</span><span class="p">,</span> <span class="mi">22170132985413848490531783256781545736605099405646311268035819648933711512452780485867743670267230573816424442101847710685057703148406327241405695594207932241067458449670531595183417759103156231396266753674309067947713122567002400734977976535077517990037756703231259947021113899161279426849577708990870731796</span><span class="p">,</span> <span class="mi">19813692100529537153354196993326523976562641892144201032611152108085873052606047939028690660226848756109920448101177116200738248725456016292678619972016171389890378572323158782910627138681771345476065407747135093852592146230620163204742268175127348379246545806302445392839995057465044154985661763415511576915</span><span class="p">,</span> <span class="mi">78365694503332388406635946375239888121420777373504294295865419461438621745194084475076351926821762908738314158329198338224524128225720604464503818477193486444917215723917379663727939853085907074473084404201033606252087766780407179445044519351567149421025751850087276632425870891542111663028730543465980924674</span><span class="p">,</span> <span class="mi">86174815022656632820771815979848030991675449543858855538627033941173753463367127894912055591372276897893437851783103074453592833551980654440535422481459741992278375567239249797317101408951009372022666702935853551917516924695550542803023670435217018079474513312282507406283149149570227529130055453440693914269</span><span class="p">,</span> <span class="mi">34251875649975900624684998660114519673055590184671553260809017427144567326208069656921748383189000068962382701183513219524420099538429211695861509218173285646800610926279186899385309575260233174554207858518171018524467259932783939780914383666363299484495396394572719367986255792364572940917973921563505448745</span><span class="p">,</span> <span class="mi">131565416119678741014839407584223561029046554798152094981545060972297005833560091291352270034957409105706026993588528015469925505101518215167306761508868265349503115829224214417137323529658877240406238182480876219586238117250727275734913776571115032892387800565095870548323872910437611015057874077022397854569</span><span class="p">,</span> <span class="mi">33815480616631994870971836193748318863481967291437195733184731238113087224536068722813183061889623448743955589560683228444185059481907449357122797432162322060345888743401660268629471753828654003871502320494829264202176494512254265921462146874076028450917313182158956935690037364855755650554334685083895867068</span><span class="p">,</span> <span class="mi">86174815022656632820771815979848030991675449543858855538627033941173753463367127894912055591372276897893437851783103074453592833551980654440535422481459741992278375567239249797317101408951009372022666702935853551917516924695550542803023670435217018079474513312282507406283149149570227529130055453440693914269</span><span class="p">,</span> <span class="mi">22170132985413848490531783256781545736605099405646311268035819648933711512452780485867743670267230573816424442101847710685057703148406327241405695594207932241067458449670531595183417759103156231396266753674309067947713122567002400734977976535077517990037756703231259947021113899161279426849577708990870731796</span><span class="p">,</span> <span class="mi">95099633707955315716043240047400293694963134315000154040199470050231601405242009961859755101495775900057639022200903957701742294339381243957985339026218101877491848982588498409542234475170365427534871365999205545899955987813295825723156661870032606446201831406566509782752822453980726176243545245206321306611</span><span class="p">,</span> <span class="mi">61737408873612311772259012945956027132119115853001428319314314241907109256087958061546894753960238529596491497895380913312688665343145849089453317670932134264932588320215145124014649556912773725283429180364888438085909811849894942273496160144562117923210401864041673502617134476745582453861241094401041426371</span><span class="p">,</span> <span class="mi">37485766595063329601220010426289654518957990907265744685366993530789457867618132860365922990882718428604529600228984964032099232874374222460511687639517298884151530863424383708182801530978733652489831846323498206754579884274193819080226605792517323786300061084936119993024406419351880798350828583190079546746</span><span class="p">,</span> <span class="mi">59091690178918932344514115276463450512958932813218218982632215803645007725632433228335302191336528516004719934113340911282619669674183859556622253453438037922671421657556268489672698428628687182827799202195089425797921832876631069571596552627010811297580734592673896904169615512613359321830332981475621145567</span><span class="p">,</span> <span class="mi">32964168544968959353510698558874273000919323952493281946099962533506939498208181688742588300431696600292065238290546021981276177298765942076660797531804323237105854415918460873117281806730392017410543607418493227646928072616545409798293188005310381977095538544131859435136369660686059342461896512437530856807</span><span class="p">,</span> <span class="mi">61737408873612311772259012945956027132119115853001428319314314241907109256087958061546894753960238529596491497895380913312688665343145849089453317670932134264932588320215145124014649556912773725283429180364888438085909811849894942273496160144562117923210401864041673502617134476745582453861241094401041426371</span><span class="p">,</span> <span class="mi">122241563213741464979968719064140698493039933777834740175915217094995940174961699629250317112942306596094029381030668383544628596970576878357003221534342655655846033783236204331593159741855823643227766075516440483252852793627722169633097234643306786225936030578609417530459491093717173598465178880769316178044</span><span class="p">,</span> <span class="mi">78365694503332388406635946375239888121420777373504294295865419461438621745194084475076351926821762908738314158329198338224524128225720604464503818477193486444917215723917379663727939853085907074473084404201033606252087766780407179445044519351567149421025751850087276632425870891542111663028730543465980924674</span><span class="p">,</span> <span class="mi">7591190426273359761941616407328929144928770113517275241093950141596156063756282617198447983218357512532106065008192311376773134252922140464779836357119244223237739097375626981010120297527408789567509829201223532075894871619418707161080401002015173531204361217534542306210196443834027818745071731611178116102</span><span class="p">,</span> <span class="mi">59091690178918932344514115276463450512958932813218218982632215803645007725632433228335302191336528516004719934113340911282619669674183859556622253453438037922671421657556268489672698428628687182827799202195089425797921832876631069571596552627010811297580734592673896904169615512613359321830332981475621145567</span><span class="p">,</span> <span class="mi">22664583763981843374303022518005994035657097278137383178209854110549233704242068066967000507844722717498970431366228359404935646715495523018056691695416834096458747223276018066714685309994835448613781345301588650015402046268973716286992844357802566430554011962162835995086846984162192044523380375361802448218</span><span class="p">,</span> <span class="mi">78365694503332388406635946375239888121420777373504294295865419461438621745194084475076351926821762908738314158329198338224524128225720604464503818477193486444917215723917379663727939853085907074473084404201033606252087766780407179445044519351567149421025751850087276632425870891542111663028730543465980924674</span><span class="p">,</span> <span class="mi">53663607942106145324856505634900952366446957335671164130522298044915630458145599229549689140621749659760530223576029477516300914481873420175142570078712350791717712867102285434801786722800007966464203566632283618002607953903231805867079414136989142782468226938194605757261613478374151072690376532757078133321</span><span class="p">,</span> <span class="mi">61737408873612311772259012945956027132119115853001428319314314241907109256087958061546894753960238529596491497895380913312688665343145849089453317670932134264932588320215145124014649556912773725283429180364888438085909811849894942273496160144562117923210401864041673502617134476745582453861241094401041426371</span><span class="p">,</span> <span class="mi">70480713168757924539311929940667780467970587842818445025524418743197460964600164745651995347296980394486922827896626755652508161710436441737113055312895245602294855426377720530563018422908207244199085965533115922382801317795420570385448911898023773378170687812737983373672258357899304606026326252164454917380</span><span class="p">,</span> <span class="mi">26047568072817115878494867894312437678288420198021118255975389413872187727029430115159427279201003925435414525092202995249992275528836448324452587202712175796867393292136562948141422497412486302036882434258287763076036896726821940579522223779143091983761347952513295578107694805378100425301153924104306062998</span><span class="p">,</span> <span class="mi">91787381900269188260278447720373303310489148968304685923635762638358985393364143392777737095065187700401801078356045890609652133551386013705471578679563002092971756426764956920204023299288270929657689101848397216780612154256911542955444439856286288474258681128430625157922381056568239575747179508619880090383</span><span class="p">,</span> <span class="mi">19776578673353144927275864184783861309264188793640244818775000749693721784434736580334695236818666332736203761370924654937786145968319601425120102369903413307379455581007799093158364222412674609843713510282895193311987501448419353965575002099029023833110758779437479839173501503297218293482700872628654297986</span><span class="p">,</span> <span class="mi">125326845192544440509276282506481573283240724338574897067845504723648638309772954799371511105917309088905368831611594229377570680550345769210665683357475682304404835864851287315570998264956738569042205063390711870398463147536649068917477705868473769928436248823742587056194359108616016055142099517087868052076</span><span class="p">,</span> <span class="mi">32964168544968959353510698558874273000919323952493281946099962533506939498208181688742588300431696600292065238290546021981276177298765942076660797531804323237105854415918460873117281806730392017410543607418493227646928072616545409798293188005310381977095538544131859435136369660686059342461896512437530856807</span><span class="p">,</span> <span class="mi">91787381900269188260278447720373303310489148968304685923635762638358985393364143392777737095065187700401801078356045890609652133551386013705471578679563002092971756426764956920204023299288270929657689101848397216780612154256911542955444439856286288474258681128430625157922381056568239575747179508619880090383</span><span class="p">,</span> <span class="mi">61737408873612311772259012945956027132119115853001428319314314241907109256087958061546894753960238529596491497895380913312688665343145849089453317670932134264932588320215145124014649556912773725283429180364888438085909811849894942273496160144562117923210401864041673502617134476745582453861241094401041426371</span><span class="p">,</span> <span class="mi">91787381900269188260278447720373303310489148968304685923635762638358985393364143392777737095065187700401801078356045890609652133551386013705471578679563002092971756426764956920204023299288270929657689101848397216780612154256911542955444439856286288474258681128430625157922381056568239575747179508619880090383</span><span class="p">,</span> <span class="mi">19776578673353144927275864184783861309264188793640244818775000749693721784434736580334695236818666332736203761370924654937786145968319601425120102369903413307379455581007799093158364222412674609843713510282895193311987501448419353965575002099029023833110758779437479839173501503297218293482700872628654297986</span><span class="p">,</span> <span class="mi">78365694503332388406635946375239888121420777373504294295865419461438621745194084475076351926821762908738314158329198338224524128225720604464503818477193486444917215723917379663727939853085907074473084404201033606252087766780407179445044519351567149421025751850087276632425870891542111663028730543465980924674</span><span class="p">,</span> <span class="mi">61737408873612311772259012945956027132119115853001428319314314241907109256087958061546894753960238529596491497895380913312688665343145849089453317670932134264932588320215145124014649556912773725283429180364888438085909811849894942273496160144562117923210401864041673502617134476745582453861241094401041426371</span><span class="p">,</span> <span class="mi">131040946974245026675658058355729944120000121321870000188404709281435584116278394991809905119413703272844512311536278017673800410331882203288245095027071614357027112724940054197254425819803021685988771514425910034927629090391726496207856325205247386443488436597264105916073735204891428125878570620071016241142</span><span class="p">,</span> <span class="mi">32964168544968959353510698558874273000919323952493281946099962533506939498208181688742588300431696600292065238290546021981276177298765942076660797531804323237105854415918460873117281806730392017410543607418493227646928072616545409798293188005310381977095538544131859435136369660686059342461896512437530856807</span><span class="p">,</span> <span class="mi">51881903993917641483997323850869811987536038225111627485870643872052008803086447178754190907042703266291567337065800056687478280445329593338406909415012963680420370144400172847215701319544343476968467495864151008758153702721097854774586711217305181423901628447556759613107726842767091009348289250122189785036</span><span class="p">,</span> <span class="mi">119068023942915123834453890801615386465501339394239797127627292458405364408652779944528299230385822484839542992300412357529700493946856868435526246881940439551516659994051777777890838403084888735602598147329910405072187829956484467108868728797474058963491292723955648893332590334862441379387587421054617352375</span><span class="p">,</span> <span class="mi">26047568072817115878494867894312437678288420198021118255975389413872187727029430115159427279201003925435414525092202995249992275528836448324452587202712175796867393292136562948141422497412486302036882434258287763076036896726821940579522223779143091983761347952513295578107694805378100425301153924104306062998</span><span class="p">,</span> <span class="mi">7591190426273359761941616407328929144928770113517275241093950141596156063756282617198447983218357512532106065008192311376773134252922140464779836357119244223237739097375626981010120297527408789567509829201223532075894871619418707161080401002015173531204361217534542306210196443834027818745071731611178116102</span><span class="p">,</span> <span class="mi">61737408873612311772259012945956027132119115853001428319314314241907109256087958061546894753960238529596491497895380913312688665343145849089453317670932134264932588320215145124014649556912773725283429180364888438085909811849894942273496160144562117923210401864041673502617134476745582453861241094401041426371</span><span class="p">,</span> <span class="mi">108623843147477631119786732455662776965429219466020757714020187646998446057803775748746530453769487275081577395650842333746842202866631361612598186542004712441099158759758755509018326899678450576264260147179759845904840404687049322108190291649207031114338018219438814789866476631689164384325667004478217180777</span><span class="p">,</span> <span class="mi">95099633707955315716043240047400293694963134315000154040199470050231601405242009961859755101495775900057639022200903957701742294339381243957985339026218101877491848982588498409542234475170365427534871365999205545899955987813295825723156661870032606446201831406566509782752822453980726176243545245206321306611</span><span class="p">,</span> <span class="mi">133351192310202563419426901323994384713440205208151868715643142935400012258411897257974968750050191281830595418066271226357824322914122125910498597975000929812150922805102417484457821873962051137397158246187719558420161623509563016907599978340865914055121915450412988237550455073879054425886488125963620347686</span><span class="p">,</span> <span class="mi">61737408873612311772259012945956027132119115853001428319314314241907109256087958061546894753960238529596491497895380913312688665343145849089453317670932134264932588320215145124014649556912773725283429180364888438085909811849894942273496160144562117923210401864041673502617134476745582453861241094401041426371</span><span class="p">,</span> <span class="mi">131040946974245026675658058355729944120000121321870000188404709281435584116278394991809905119413703272844512311536278017673800410331882203288245095027071614357027112724940054197254425819803021685988771514425910034927629090391726496207856325205247386443488436597264105916073735204891428125878570620071016241142</span><span class="p">,</span> <span class="mi">53663607942106145324856505634900952366446957335671164130522298044915630458145599229549689140621749659760530223576029477516300914481873420175142570078712350791717712867102285434801786722800007966464203566632283618002607953903231805867079414136989142782468226938194605757261613478374151072690376532757078133321</span><span class="p">,</span> <span class="mi">105556932542245217837514115055775462864903512903809995567283778630584585678106941149852343294250017922855045081349459579094317034729691863434432162931660961638290043282138627957649917234937135249663297808688852822695562463651780284273851153820189241714031472163530769144140864209408438325377119537941221960531</span><span class="p">,</span> <span class="mi">22664583763981843374303022518005994035657097278137383178209854110549233704242068066967000507844722717498970431366228359404935646715495523018056691695416834096458747223276018066714685309994835448613781345301588650015402046268973716286992844357802566430554011962162835995086846984162192044523380375361802448218</span><span class="p">,</span> <span class="mi">22170132985413848490531783256781545736605099405646311268035819648933711512452780485867743670267230573816424442101847710685057703148406327241405695594207932241067458449670531595183417759103156231396266753674309067947713122567002400734977976535077517990037756703231259947021113899161279426849577708990870731796</span><span class="p">,</span> <span class="mi">91787381900269188260278447720373303310489148968304685923635762638358985393364143392777737095065187700401801078356045890609652133551386013705471578679563002092971756426764956920204023299288270929657689101848397216780612154256911542955444439856286288474258681128430625157922381056568239575747179508619880090383</span><span class="p">,</span> <span class="mi">78365694503332388406635946375239888121420777373504294295865419461438621745194084475076351926821762908738314158329198338224524128225720604464503818477193486444917215723917379663727939853085907074473084404201033606252087766780407179445044519351567149421025751850087276632425870891542111663028730543465980924674</span><span class="p">,</span> <span class="mi">61737408873612311772259012945956027132119115853001428319314314241907109256087958061546894753960238529596491497895380913312688665343145849089453317670932134264932588320215145124014649556912773725283429180364888438085909811849894942273496160144562117923210401864041673502617134476745582453861241094401041426371</span><span class="p">,</span> <span class="mi">39567326944456595185852131549239713048406760014375723185889668137264862184400625209347132385346771952845648844528249396652730647892825213067744420896877172327145941557401152582745524351689936262218846212578493068131068289265309178184007416700486534305431585962239171245639859026914854729185183441536829994448</span><span class="p">,</span> <span class="mi">78365694503332388406635946375239888121420777373504294295865419461438621745194084475076351926821762908738314158329198338224524128225720604464503818477193486444917215723917379663727939853085907074473084404201033606252087766780407179445044519351567149421025751850087276632425870891542111663028730543465980924674</span><span class="p">,</span> <span class="mi">37485766595063329601220010426289654518957990907265744685366993530789457867618132860365922990882718428604529600228984964032099232874374222460511687639517298884151530863424383708182801530978733652489831846323498206754579884274193819080226605792517323786300061084936119993024406419351880798350828583190079546746</span><span class="p">,</span> <span class="mi">54654851876914080966669294072266680316237257314112763522717957624090555990759711312831465420820115888060496319530663148955963721935388528488503095888463911956642207510234857634578445323935685115331866533375908740782162677968051666308084412334476185841082309379065946002682963601103366953276426988653294184985</span><span class="p">,</span> <span class="mi">42482427773147130194812689536913368638500081237478535489659215264193263428770540828147841848358274276495344365420108498381423756998877818209503381681969582766793835586739511090517781184229755174548633034965819780902871349417908442111735773596392436160814727974903411429784536931401566107378581772146035766032</span><span class="p">,</span> <span class="mi">35930567221176949983032393471537465956255142659604274746127055228630351918767533995190245953000208387959040650822605531305590422970245280265227270608180544226270924727120053380823893678184112932417170980296052271050084089289663890989780614126562039368255291578422422201128945232924297966192833485833017989673</span><span class="p">,</span> <span class="mi">23143986891216249914663826063115820607206746945143883358014118079713956430178113457314904759546411358799835088875030074243573599227417981305876359711490612127320931332708264875195350899805210021457591886105523051676279929638131079316059284303837762361507811984602430228290510398571565718816739452416463824733</span><span class="p">]</span>
+
+<span class="n">m0</span><span class="p">,</span> <span class="n">m1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="sa">b</span><span class="s">"Ha"</span><span class="p">)</span>
+<span class="n">kn1</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">m0</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="o">-</span> <span class="n">cs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">kn2</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="o">-</span> <span class="n">cs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">kn1</span><span class="p">,</span> <span class="n">kn2</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">pow</span><span class="p">(</span><span class="n">m0</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">==</span> <span class="n">cs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">lookup</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({(</span><span class="nb">pow</span><span class="p">(</span><span class="n">byte</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">byte</span><span class="p">)</span> <span class="k">for</span> <span class="n">byte</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">128</span><span class="p">)})</span> <span class="c1"># lookup table to speed things up a bit
+</span><span class="n">flag</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">lookup</span><span class="p">[</span><span class="n">ct</span><span class="p">]</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">cs</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+<span class="c1"># HarekazeCTF{Can_you_Recover_with0ut_the_public_4nd_pr1vate_keys!?}
+</span></code></pre></div></div>
+
+<h4 id="flag-harekazectfcan_you_recover_with0ut_the_public_4nd_pr1vate_keys">Flag: <code class="language-plaintext highlighter-rouge">HarekazeCTF{Can_you_Recover_with0ut_the_public_4nd_pr1vate_keys!?}</code></h4>
+
+
+</article>
+
+
+
+<div class="post-pagination">
+  
+    <a class="post-pagination-item newer" href="/posts/2021-12-25-asis-finals">
+      <i class="fas fa-chevron-left"></i> <span class="post-pagination-title">ASIS CTF Finals 2021
+</span>
+    </a>
+  
+
+  
+    <span class="post-pagination-item older"></span>
+  
+</div>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>
