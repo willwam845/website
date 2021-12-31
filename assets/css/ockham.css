@@ -245,7 +245,7 @@ a.social-icon {
       display: inline;
       opacity: .5; } }
 .page h1, .page h2, .page h3, .page h4, .page h5, .page h6, .post h1, .post h2, .post h3, .post h4, .post h5, .post h6 {
-  font-family: var(--heading-font);
+  font-family: var(--body-font);
   color: var(--heading-color); }
 
 .post-title {
