@@ -209,38 +209,36 @@ f_1^a * f_2^b = f^{d_1 * a + d_2 * b}\]
 
 <h1 id="solve-script">solve script</h1>
 
-<p>Putting this altogether, we get a script that runs in about 20 minutes. The main places where the script is quite slow are getting data from the server, calculating good tuples and the actual meet in the middle itself.</p>
+<p>Putting this altogether, we get a script that runs in about 5 minutes. The main places where the script is quite slow is calculating good tuples and the actual meet in the middle itself.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">import</span> <span class="nn">ast</span>
 <span class="kn">from</span> <span class="nn">z3</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">gcd</span>
 
 <span class="n">s</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"139.162.61.222"</span><span class="p">,</span> <span class="mi">13373</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="n">s</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-    <span class="n">fault</span><span class="p">,</span> <span class="n">dec</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">fault</span><span class="p">,</span> <span class="n">dec</span>
+<span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">rep</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendline</span><span class="p">((</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="se">\n</span><span class="s">"</span> <span class="o">*</span> <span class="n">rep</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">dat</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">recvlines</span><span class="p">(</span><span class="n">rep</span><span class="p">)</span>
+    <span class="n">dat</span> <span class="o">=</span> <span class="p">[</span><span class="n">ast</span><span class="p">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">line</span><span class="p">.</span><span class="n">decode</span><span class="p">())</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">dat</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">rep</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dat</span>
 
 <span class="n">dec</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="k">while</span> <span class="n">dec</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
     <span class="n">fault</span><span class="p">,</span> <span class="n">dec</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">n</span> <span class="o">=</span> <span class="n">dec</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="n">flags</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-    <span class="n">fault</span><span class="p">,</span> <span class="n">dec</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s">"c"</span><span class="p">)</span>
-    <span class="n">flags</span><span class="p">[</span><span class="n">fault</span><span class="p">]</span> <span class="o">=</span> <span class="n">dec</span>
+<span class="n">flagdat</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="s">"c"</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">flags</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">flagdat</span><span class="p">)</span>
 
-<span class="n">tuples</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">)):</span> <span class="c1"># this takes so long :(
-</span>    <span class="n">fault</span><span class="p">,</span> <span class="n">dec</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-    <span class="n">tuples</span><span class="p">[</span><span class="n">fault</span><span class="p">]</span> <span class="o">=</span> <span class="n">dec</span>
+<span class="n">tupledat</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2000</span><span class="p">)</span>
+<span class="n">tuples</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">tupledat</span><span class="p">)</span>
 
 <span class="n">s</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
 
@@ -257,7 +255,7 @@ f_1^a * f_2^b = f^{d_1 * a + d_2 * b}\]
     <span class="k">return</span> <span class="n">gcd</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span>
 
 <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">itertools</span><span class="p">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">rands</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">)):</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">y</span><span class="p">)[</span><span class="mi">2</span><span class="p">:])[</span><span class="s">"1"</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">y</span><span class="p">).</span><span class="n">count</span><span class="p">(</span><span class="s">"1"</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="mi">42</span><span class="p">:</span>
         <span class="n">goodtuples</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
         <span class="k">print</span><span class="p">(</span><span class="s">"found good tuple: "</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
@@ -275,6 +273,7 @@ f_1^a * f_2^b = f^{d_1 * a + d_2 * b}\]
 
 <span class="k">def</span> <span class="nf">tree2</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span>
+    <span class="k">if</span> <span class="n">s1</span> <span class="ow">and</span> <span class="n">s2</span><span class="p">:</span> <span class="k">return</span>
     <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="n">n2</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="n">lookup_one</span><span class="p">:</span>
             <span class="k">print</span><span class="p">(</span><span class="s">"sice"</span><span class="p">,</span> <span class="n">lookup_one</span><span class="p">[</span><span class="n">current</span><span class="p">],</span> <span class="n">path</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>
@@ -328,6 +327,7 @@ f_1^a * f_2^b = f^{d_1 * a + d_2 * b}\]
     <span class="n">mul1</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="nb">pow</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bits1</span><span class="p">]</span>
     <span class="n">mul2</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">pow</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bits2</span><span class="p">]</span>
     
+    <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
     <span class="n">lookup_one</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">tree1</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">print</span><span class="p">(</span><span class="s">"lookup created"</span><span class="p">)</span>
@@ -358,7 +358,8 @@ f_1^a * f_2^b = f^{d_1 * a + d_2 * b}\]
         <span class="n">recoverflag</span><span class="p">(</span><span class="n">_d</span> <span class="o">-</span> <span class="mi">2</span><span class="o">**</span><span class="mi">128</span><span class="p">)</span>
 
 <span class="c1"># Flag: TetCTF{4n_unr34l1st1c_f4ult____1_th1nk}
-</span></code></pre></div></div>
+</span>
+</code></pre></div></div>
 
 <h4 id="flag-tetctf4n_unr34l1st1c_f4ult____1_th1nk">Flag: <code class="language-plaintext highlighter-rouge">TetCTF{4n_unr34l1st1c_f4ult____1_th1nk}</code></h4>
 
