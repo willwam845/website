@@ -165,9 +165,11 @@
 
 <p>We are given that for each of the primes $p, q, r$, $gcd(e, prime - 1)$ is a prime number, meaning it cannot be 1. We are also told that the product of these gcd’s for each prime is $e$ itself, meaning that $e$ is comprised of a prime factor from each of $p-1, q-1, r-1$.</p>
 
-<p>To figure out what prime factor this is, recall Fermat’s Little Theorem, which states that:
-\(a^{p-1} \equiv 1 \mod p\)
-Let the prime factor of $p-1$ that makes up the exponent be $e_p$. We are given $c^{e_p}$ for some unknown $c$. If we raise this to a power $x$ such that $e_p * x = p - 1$, then the result should be 1. Since $e_p$ is a factor of $p-1$, we can enumerate all factors of $p-1$ and then raise $c^{e_p}$ to the power of $\frac{p-1}{e_p}$, and see if the result is equal to 1. If so, we know that our guess for $e_p$ is correct.</p>
+<p>To figure out what prime factor this is, recall Fermat’s Little Theorem, which states that:</p>
+
+\[a^{p-1} \equiv 1 \mod p\]
+
+<p>Let the prime factor of $p-1$ that makes up the exponent be $e_p$. We are given $c^{e_p}$ for some unknown $c$. If we raise this to a power $x$ such that $e_p * x = p - 1$, then the result should be 1. Since $e_p$ is a factor of $p-1$, we can enumerate all factors of $p-1$ and then raise $c^{e_p}$ to the power of $\frac{p-1}{e_p}$, and see if the result is equal to 1. If so, we know that our guess for $e_p$ is correct.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span><span class="o">=</span><span class="mi">127846753573603084140032502367311687577517286192893830888210505400863747960458410091624928485398237221748639465569360357083610343901195273740653100259873512668015324620239720302434418836556626441491996755736644886234427063508445212117628827393696641594389475794455769831224080974098671804484986257952189021223</span>
 <span class="n">q</span><span class="o">=</span><span class="mi">145855456487495382044171198958191111759614682359121667762539436558951453420409098978730659224765186993202647878416602503196995715156477020462357271957894750950465766809623184979464111968346235929375202282811814079958258215558862385475337911665725569669510022344713444067774094112542265293776098223712339100693</span>
