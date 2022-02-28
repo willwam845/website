@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/normalize.css">
+  <link rel="stylesheet" href="/assets/css/ockham.css">
+  <script async src="/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> SUSCTF 2022 | willwam845 </title>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/about/" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+      <li">
+        <a href="/projects/" class="sidebar-nav-item ">
+          projects
+        </a>
+      </li>
+    
+      <li">
+        <a href="/archive/" class="sidebar-nav-item ">
+          archive
+        </a>
+      </li>
+    
+      <li">
+        <a href="/tags/" class="sidebar-nav-item ">
+          tags
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">SUSCTF 2022</h1>
+  <div class="post-meta">
+    <time datetime="2022-02-28T00:00:00+00:00" itemprop="datePublished">
+      28 Feb 2022
+    </time></div>
+
+  <table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Challenge Name</strong></th>
+      <th style="text-align: center">Tags</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><a href="#large-case">large case</a></td>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">rsa</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><a href="#ez-pager-typer">ez pager typer</a></td>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">lfsr</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="large-case">large case</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">e</span><span class="p">,</span><span class="n">message</span>
+
+<span class="k">def</span> <span class="nf">pad</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">3</span><span class="o">*</span><span class="n">L</span><span class="p">:</span>
+        <span class="n">s</span><span class="o">+=</span><span class="nb">bytes</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">L</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+<span class="n">L</span><span class="o">=</span><span class="mi">128</span>
+<span class="n">p</span><span class="o">=</span><span class="mi">127846753573603084140032502367311687577517286192893830888210505400863747960458410091624928485398237221748639465569360357083610343901195273740653100259873512668015324620239720302434418836556626441491996755736644886234427063508445212117628827393696641594389475794455769831224080974098671804484986257952189021223</span>
+<span class="n">q</span><span class="o">=</span><span class="mi">145855456487495382044171198958191111759614682359121667762539436558951453420409098978730659224765186993202647878416602503196995715156477020462357271957894750950465766809623184979464111968346235929375202282811814079958258215558862385475337911665725569669510022344713444067774094112542265293776098223712339100693</span>
+<span class="n">r</span><span class="o">=</span><span class="mi">165967627827619421909025667485886197280531070386062799707570138462960892786375448755168117226002965841166040777799690060003514218907279202146293715568618421507166624010447447835500614000601643150187327886055136468260391127675012777934049855029499330117864969171026445847229725440665179150874362143944727374907</span>
+<span class="n">n</span><span class="o">=</span><span class="n">p</span><span class="o">*</span><span class="n">q</span><span class="o">*</span><span class="n">r</span>
+
+<span class="k">assert</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">GCD</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">GCD</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">GCD</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">r</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="ow">and</span> <span class="n">e</span><span class="o">==</span><span class="n">GCD</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">GCD</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">GCD</span><span class="p">(</span><span class="n">e</span><span class="p">,</span><span class="n">r</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="o">&gt;</span><span class="n">L</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">*</span><span class="n">L</span>
+<span class="k">assert</span> <span class="sa">b</span><span class="s">'SUSCTF'</span> <span class="ow">in</span> <span class="n">message</span>
+<span class="n">m</span><span class="o">=</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">pad</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+
+<span class="n">c</span><span class="o">=</span><span class="nb">pow</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">e</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="s">'''
+2832775557487418816663494645849097066925967799754895979829784499040437385450603537732862576495758207240632734290947928291961063611897822688909447511260639429367768479378599532712621774918733304857247099714044615691877995534173849302353620399896455615474093581673774297730056975663792651743809514320379189748228186812362112753688073161375690508818356712739795492736743994105438575736577194329751372142329306630950863097761601196849158280502041616545429586870751042908365507050717385205371671658706357669408813112610215766159761927196639404951251535622349916877296956767883165696947955379829079278948514755758174884809479690995427980775293393456403529481055942899970158049070109142310832516606657100119207595631431023336544432679282722485978175459551109374822024850128128796213791820270973849303929674648894135672365776376696816104314090776423931007123128977218361110636927878232444348690591774581974226318856099862175526133892
+'''</span>
+</code></pre></div></div>
+
+<p>The flag is padded with trailing null bytes and encrypted with RSA using three primes. $e$ is however unknown.</p>
+
+<h3 id="solution">solution</h3>
+
+<p>We are given that for each of the primes $p, q, r$, $gcd(e, prime - 1)$ is a prime number, meaning it cannot be 1. We are also told that the product of these gcd’s for each prime is $e$ itself, meaning that $e$ is comprised of a prime factor from each of $p-1, q-1, r-1$.</p>
+
+<p>To figure out what prime factor this is, recall Fermat’s Little Theorem, which states that:
+\(a^{p-1} \equiv 1 \mod p\)
+Let the prime factor of $p-1$ that makes up the exponent be $e_p$. We are given $c^{e_p}$ for some unknown $c$. If we raise this to a power $x$ such that $e_p * x = p - 1$, then the result should be 1. Since $e_p$ is a factor of $p-1$, we can enumerate all factors of $p-1$ and then raise $c^{e_p}$ to the power of $\frac{p-1}{e_p}$, and see if the result is equal to 1. If so, we know that our guess for $e_p$ is correct.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">p</span><span class="o">=</span><span class="mi">127846753573603084140032502367311687577517286192893830888210505400863747960458410091624928485398237221748639465569360357083610343901195273740653100259873512668015324620239720302434418836556626441491996755736644886234427063508445212117628827393696641594389475794455769831224080974098671804484986257952189021223</span>
+<span class="n">q</span><span class="o">=</span><span class="mi">145855456487495382044171198958191111759614682359121667762539436558951453420409098978730659224765186993202647878416602503196995715156477020462357271957894750950465766809623184979464111968346235929375202282811814079958258215558862385475337911665725569669510022344713444067774094112542265293776098223712339100693</span>
+<span class="n">r</span><span class="o">=</span><span class="mi">165967627827619421909025667485886197280531070386062799707570138462960892786375448755168117226002965841166040777799690060003514218907279202146293715568618421507166624010447447835500614000601643150187327886055136468260391127675012777934049855029499330117864969171026445847229725440665179150874362143944727374907</span>
+<span class="n">c</span><span class="o">=</span><span class="mi">2832775557487418816663494645849097066925967799754895979829784499040437385450603537732862576495758207240632734290947928291961063611897822688909447511260639429367768479378599532712621774918733304857247099714044615691877995534173849302353620399896455615474093581673774297730056975663792651743809514320379189748228186812362112753688073161375690508818356712739795492736743994105438575736577194329751372142329306630950863097761601196849158280502041616545429586870751042908365507050717385205371671658706357669408813112610215766159761927196639404951251535622349916877296956767883165696947955379829079278948514755758174884809479690995427980775293393456403529481055942899970158049070109142310832516606657100119207595631431023336544432679282722485978175459551109374822024850128128796213791820270973849303929674648894135672365776376696816104314090776423931007123128977218361110636927878232444348690591774581974226318856099862175526133892</span>
+
+<span class="n">pfac</span> <span class="o">=</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">757</span><span class="p">,</span> <span class="mi">1709</span><span class="p">,</span> <span class="mi">85015583</span><span class="p">,</span> <span class="mi">339028665499</span><span class="p">,</span> <span class="mi">149105250954771885483776047</span><span class="p">,</span> <span class="mi">1642463892686572578602085475101104723805585678675707586553009837707279291648160744722745420570786735582631019452016654157586623543454908938807521637550223579103317696104438456966780396624343550451096013730928292041667133825444056448136643704677066463120079</span><span class="p">]</span>
+<span class="n">qfac</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">66553</span><span class="p">,</span> <span class="mi">84405986771</span><span class="p">,</span> <span class="mi">38037107558208320033</span><span class="p">,</span> <span class="mi">16137718604846030589135490851713</span><span class="p">,</span> <span class="mi">14369576056311038198362075935199486201201115381094289671031774994452214307042971166730146897009438957078052300683916910041250723573953110349566216311685009675744215421971185909678546052934704709232060199286321405045769976194110037</span><span class="p">]</span>
+<span class="n">rfac</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5156273</span><span class="p">,</span> <span class="mi">10012111</span><span class="p">,</span> <span class="mi">11607389</span><span class="p">,</span> <span class="mi">68872137169799749</span><span class="p">,</span> <span class="mi">9691125310820433463</span><span class="p">,</span> <span class="mi">12030248809636768339</span><span class="p">,</span> <span class="mi">31518759824860728158228953</span><span class="p">,</span> <span class="mi">36076471911113920369056477734714059</span><span class="p">]</span>
+
+<span class="n">pr</span> <span class="o">=</span> <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="n">pfac</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">qfac</span><span class="p">,</span> <span class="n">r</span><span class="p">:</span> <span class="n">rfac</span><span class="p">}</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">for</span> <span class="n">prime</span><span class="p">,</span> <span class="n">facs</span> <span class="ow">in</span> <span class="n">pr</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">prime</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">fac</span> <span class="ow">in</span> <span class="n">facs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="p">(</span><span class="n">prime</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="n">fac</span><span class="p">,</span> <span class="n">prime</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"found factor:"</span><span class="p">,</span> <span class="n">fac</span><span class="p">)</span>
+            <span class="n">e</span> <span class="o">*=</span> <span class="n">fac</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"e:"</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>127846753573603084140032502367311687577517286192893830888210505400863747960458410091624928485398237221748639465569360357083610343901195273740653100259873512668015324620239720302434418836556626441491996755736644886234427063508445212117628827393696641594389475794455769831224080974098671804484986257952189021223
+found factor: 757
+145855456487495382044171198958191111759614682359121667762539436558951453420409098978730659224765186993202647878416602503196995715156477020462357271957894750950465766809623184979464111968346235929375202282811814079958258215558862385475337911665725569669510022344713444067774094112542265293776098223712339100693
+found factor: 66553
+165967627827619421909025667485886197280531070386062799707570138462960892786375448755168117226002965841166040777799690060003514218907279202146293715568618421507166624010447447835500614000601643150187327886055136468260391127675012777934049855029499330117864969171026445847229725440665179150874362143944727374907
+found factor: 5156273
+</code></pre></div></div>
+
+<p>So, now we have the value of $e$, how do we get the flag?</p>
+
+<p>We’ll need to take the e’th root mod each of these primes, and then combine them with CRT to get possible values for the flag, which we can then check for <code class="language-plaintext highlighter-rouge">SUSCTF</code> to get the right one. The issue here is that there will exist $e$ possible roots after combining with CRT, which will be far too many to search through, given that $e$ is around 48 bits long.</p>
+
+<p>We can use a bit more information in the code to help us out though. We are given that: <code class="language-plaintext highlighter-rouge">assert len(message)&gt;L and len(message)&lt;2*L</code></p>
+
+<p>This means that, because of the pad function, the padded message will end in 128 null bytes, which gives us 1024 bits of information and therefore only requires us to find 2048 more bits. We can get these bits by only taking roots mod $p$ and $q$, which there will be $757 * 66553 = 50380621$ possible roots of, and then combining all the information we have with CRT, we should be able to get a bunch of possible flags.</p>
+
+<p>The code for the n’th root algorithm was taken from <a href="https://blog.soreatu.com/posts/intended-solution-to-crypto-problems-in-nctf-2019/#easyrsa909pt-2solvers">here</a>. Solve script runs in about 30 minutes.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">def</span> <span class="nf">AMM</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">----------------------------------------------------------------------------------'</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Start to run Adleman-Manders-Miller Root Extraction Method'</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Try to find one {:#x}th root of {} modulo {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">GF</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="n">o</span> <span class="o">=</span> <span class="n">g</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">g</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
+    <span class="k">while</span> <span class="n">p</span> <span class="o">^</span> <span class="p">((</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">g</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'[+] Find p:{}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">q</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="n">s</span> <span class="o">%</span> <span class="n">r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">//</span> <span class="n">r</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'[+] Find s:{}, t:{}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">r</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">alp</span> <span class="o">=</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">s</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">r</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'[+] Find alp:{}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">alp</span><span class="p">))</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">p</span> <span class="o">^</span> <span class="p">(</span><span class="n">r</span><span class="o">**</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">o</span> <span class="o">^</span> <span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">alp</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">p</span> <span class="o">^</span> <span class="n">s</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">b</span> <span class="o">^</span> <span class="p">(</span><span class="n">r</span><span class="o">^</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">i</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'[+] Calculating DLP...'</span><span class="p">)</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="o">-</span> <span class="n">discrete_log</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'[+] Finish DLP...'</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">*</span> <span class="p">(</span><span class="n">c</span><span class="o">^</span><span class="n">r</span><span class="p">)</span><span class="o">^</span><span class="n">j</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">h</span> <span class="o">*</span> <span class="n">c</span><span class="o">^</span><span class="n">j</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">c</span><span class="o">^</span><span class="n">r</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">o</span><span class="o">^</span><span class="n">alp</span> <span class="o">*</span> <span class="n">h</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Finished in {} seconds."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Find one solution: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span> <span class="nf">findAllPRoot</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Start to find all the Primitive {:#x}th root of 1 modulo {}."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">proot</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">proot</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="o">%</span> <span class="mi">5000</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># just to keep track of how many roots left
+</span>            <span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">proot</span><span class="p">))</span>
+        <span class="n">proot</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="n">e</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Finished in {} seconds."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">proot</span>
+
+<span class="k">def</span> <span class="nf">findAllSolutions</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">proot</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Start to find all the {:#x}th root of {} modulo {}."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">all_mp</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">proot</span><span class="p">:</span>
+        <span class="n">mp2</span> <span class="o">=</span> <span class="n">mp</span> <span class="o">*</span> <span class="n">root</span> <span class="o">%</span> <span class="n">p</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">mp2</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="o">==</span> <span class="n">cp</span><span class="p">):</span>
+            <span class="n">all_mp</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">mp2</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Finished in {} seconds."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">all_mp</span>
+
+<span class="k">def</span> <span class="nf">find_roots</span><span class="p">(</span><span class="n">_c</span><span class="p">,</span> <span class="n">_e</span><span class="p">,</span> <span class="n">_p</span><span class="p">):</span>
+    <span class="n">mp</span> <span class="o">=</span> <span class="n">AMM</span><span class="p">(</span><span class="n">_c</span><span class="p">,</span> <span class="n">_e</span><span class="p">,</span> <span class="n">_p</span><span class="p">)</span>
+    <span class="n">p_proot</span> <span class="o">=</span> <span class="n">findAllPRoot</span><span class="p">(</span><span class="n">_p</span><span class="p">,</span> <span class="n">_e</span><span class="p">)</span>
+    <span class="n">mps</span> <span class="o">=</span> <span class="n">findAllSolutions</span><span class="p">(</span><span class="n">mp</span><span class="p">,</span> <span class="n">p_proot</span><span class="p">,</span> <span class="n">_c</span><span class="p">,</span> <span class="n">_p</span><span class="p">,</span> <span class="n">_e</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mps</span>
+
+
+<span class="n">p</span> <span class="o">=</span> <span class="mi">127846753573603084140032502367311687577517286192893830888210505400863747960458410091624928485398237221748639465569360357083610343901195273740653100259873512668015324620239720302434418836556626441491996755736644886234427063508445212117628827393696641594389475794455769831224080974098671804484986257952189021223</span>
+<span class="n">q</span> <span class="o">=</span> <span class="mi">145855456487495382044171198958191111759614682359121667762539436558951453420409098978730659224765186993202647878416602503196995715156477020462357271957894750950465766809623184979464111968346235929375202282811814079958258215558862385475337911665725569669510022344713444067774094112542265293776098223712339100693</span>
+<span class="n">r</span> <span class="o">=</span> <span class="mi">165967627827619421909025667485886197280531070386062799707570138462960892786375448755168117226002965841166040777799690060003514218907279202146293715568618421507166624010447447835500614000601643150187327886055136468260391127675012777934049855029499330117864969171026445847229725440665179150874362143944727374907</span>
+
+<span class="n">e</span> <span class="o">=</span> <span class="mi">259776235785533</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mi">2832775557487418816663494645849097066925967799754895979829784499040437385450603537732862576495758207240632734290947928291961063611897822688909447511260639429367768479378599532712621774918733304857247099714044615691877995534173849302353620399896455615474093581673774297730056975663792651743809514320379189748228186812362112753688073161375690508818356712739795492736743994105438575736577194329751372142329306630950863097761601196849158280502041616545429586870751042908365507050717385205371671658706357669408813112610215766159761927196639404951251535622349916877296956767883165696947955379829079278948514755758174884809479690995427980775293393456403529481055942899970158049070109142310832516606657100119207595631431023336544432679282722485978175459551109374822024850128128796213791820270973849303929674648894135672365776376696816104314090776423931007123128977218361110636927878232444348690591774581974226318856099862175526133892</span>
+
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">gcd</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">long_to_bytes</span>
+
+<span class="n">ep</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">eq</span> <span class="o">=</span> <span class="n">gcd</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dp</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">e</span><span class="o">//</span><span class="n">ep</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dq</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">e</span><span class="o">//</span><span class="n">eq</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">cp</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">dp</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+<span class="n">cq</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">dq</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
+<span class="n">proots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">find_roots</span><span class="p">(</span><span class="n">cp</span><span class="p">,</span> <span class="n">ep</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">proots</span><span class="p">))</span>
+<span class="n">qroots</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">find_roots</span><span class="p">(</span><span class="n">cq</span><span class="p">,</span> <span class="n">eq</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span> <span class="c1"># takes about 10 minutes
+</span><span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qroots</span><span class="p">))</span>
+
+<span class="n">qrootadd</span> <span class="o">=</span> <span class="p">[</span><span class="n">CRT</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">root</span><span class="p">)],</span> <span class="p">[</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">1024</span><span class="p">,</span> <span class="n">q</span><span class="p">])</span> <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">qroots</span><span class="p">]</span> <span class="c1"># precompute these
+</span>
+<span class="n">n1</span> <span class="o">=</span> <span class="n">p</span>
+<span class="n">n2</span> <span class="o">=</span> <span class="n">q</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">&lt;&lt;</span><span class="mi">1024</span><span class="p">)</span>
+<span class="n">k1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n2</span><span class="p">))</span>
+<span class="n">k2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">n2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n1</span><span class="p">))</span>
+<span class="n">n3</span> <span class="o">=</span> <span class="n">n1</span> <span class="o">*</span> <span class="n">n2</span>
+
+<span class="k">def</span> <span class="nf">crt</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span> <span class="c1"># optimization since the moduli remain the same
+</span>    <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">k2</span><span class="o">*</span><span class="n">n2</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">k1</span><span class="o">*</span><span class="n">n1</span><span class="p">)</span> <span class="o">%</span> <span class="n">n3</span>
+
+<span class="k">for</span> <span class="n">proot</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">proots</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">qroot</span> <span class="ow">in</span> <span class="n">qrootadd</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">crt</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">proot</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">qroot</span><span class="p">),</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="o">*&lt;&lt;</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="k">if</span> <span class="sa">b</span><span class="s">'SUSCTF'</span><span class="p">.</span><span class="nb">hex</span><span class="p">()</span> <span class="ow">in</span> <span class="nb">hex</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>For RSA, the wrong key generation method can also reveal information. You recover my secret message, and here is the flag:SUSCTF{N0n_c0prime_RSA_c1pher_cAn_a1s0_recover_me33age!!!}\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00
+</code></pre></div></div>
+
+<h4 id="flag-susctfn0n_c0prime_rsa_c1pher_can_a1s0_recover_me33age">Flag: <code class="language-plaintext highlighter-rouge">SUSCTF{N0n_c0prime_RSA_c1pher_cAn_a1s0_recover_me33age!!!}</code></h4>
+
+<h2 id="ez-pager-typer">ez pager typer</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">lfsr</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">length</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">seed</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">next_state</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">state</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">state</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">^=</span> <span class="p">(</span><span class="n">i</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span>
+        <span class="n">next_state</span> <span class="o">^=</span> <span class="n">output</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">next_state</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+    <span class="k">def</span> <span class="nf">getrandbit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbit</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbit</span><span class="p">):</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="n">output</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="bp">self</span><span class="p">.</span><span class="nb">next</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+
+<span class="k">class</span> <span class="nc">generator</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lfsr1</span><span class="p">,</span> <span class="n">lfsr2</span><span class="p">,</span> <span class="n">magic</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">lfsr1</span> <span class="o">=</span> <span class="n">lfsr1</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">lfsr2</span> <span class="o">=</span> <span class="n">lfsr2</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">magic</span> <span class="o">=</span> <span class="n">magic</span>
+
+    <span class="k">def</span> <span class="nf">infinit_power</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">magic</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">magic</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">malicious_magic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">magic</span><span class="p">):</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">magic</span> <span class="o">&amp;</span> <span class="n">magic</span><span class="p">)</span>
+        <span class="n">magic</span> <span class="o">^=</span> <span class="n">now</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">now</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">magic</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">confusion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">):</span>
+        <span class="n">magic</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">magic</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">cnt</span> <span class="o">=</span> <span class="n">magic</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">output</span> <span class="o">^=</span> <span class="n">c1</span> <span class="o">^</span> <span class="n">c2</span>
+        <span class="k">while</span> <span class="n">magic</span><span class="p">:</span>
+            <span class="n">now</span><span class="p">,</span> <span class="n">magic</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">malicious_magic</span><span class="p">(</span><span class="n">magic</span><span class="p">)</span>
+            <span class="n">cnt</span> <span class="o">^=</span> <span class="n">now</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="n">now</span><span class="p">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">^=</span> <span class="n">now</span>
+        <span class="n">output</span> <span class="o">^=</span> <span class="n">cnt</span> <span class="o">*</span> <span class="n">c1</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">getrandbit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbit</span><span class="p">):</span>
+        <span class="n">output1</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">lfsr1</span><span class="p">.</span><span class="n">getrandbit</span><span class="p">(</span><span class="n">nbit</span><span class="p">)</span>
+        <span class="n">output2</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">lfsr2</span><span class="p">.</span><span class="n">getrandbit</span><span class="p">(</span><span class="n">nbit</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">confusion</span><span class="p">(</span><span class="n">output1</span><span class="p">,</span> <span class="n">output2</span><span class="p">)</span>
+    
+<span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">mask1</span><span class="p">,</span> <span class="n">mask2</span><span class="p">,</span> <span class="n">seed1</span><span class="p">,</span> <span class="n">seed2</span><span class="p">,</span> <span class="n">seed3</span>
+<span class="n">n1</span><span class="p">,</span> <span class="n">n2</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">12</span>
+
+<span class="n">flag</span> <span class="o">=</span> <span class="s">'SUSCTF{***}'</span>
+
+<span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">cipher</span><span class="p">,</span> <span class="n">ipath</span><span class="p">,</span> <span class="n">opath</span><span class="p">):</span>
+    <span class="n">ifile</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">ipath</span><span class="p">,</span><span class="s">'rb'</span><span class="p">)</span>
+    <span class="n">ofile</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">opath</span><span class="p">,</span><span class="s">'wb'</span><span class="p">)</span>
+    <span class="n">plaintext</span><span class="o">=</span><span class="n">ifile</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">plaintext</span><span class="p">:</span>
+        <span class="n">c</span><span class="o">=</span><span class="n">ch</span><span class="o">^</span><span class="n">cipher</span><span class="p">.</span><span class="n">getrandbit</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">ofile</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+    <span class="n">ifile</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">ofile</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">problem1</span><span class="p">():</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">getRandomInteger</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">magic</span> <span class="o">=</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">r</span>
+    <span class="n">lfsr1</span> <span class="o">=</span> <span class="n">lfsr</span><span class="p">(</span><span class="n">seed1</span><span class="p">,</span> <span class="n">mask1</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
+    <span class="n">lfsr2</span> <span class="o">=</span> <span class="n">lfsr</span><span class="p">(</span><span class="n">seed2</span><span class="p">,</span> <span class="n">mask2</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
+    <span class="n">cipher</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">lfsr1</span><span class="p">,</span> <span class="n">lfsr2</span><span class="p">,</span> <span class="n">magic</span><span class="p">)</span>
+    <span class="n">encrypt</span><span class="p">(</span><span class="n">cipher</span><span class="p">,</span> <span class="s">"MTk4NC0wNC0wMQ==_6d30.txt"</span><span class="p">,</span> <span class="s">"MTk4NC0wNC0wMQ==_6d30.enc"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">problem2</span><span class="p">():</span>
+    <span class="n">magic</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span>
+    <span class="n">lfsr1</span><span class="o">=</span><span class="n">lfsr</span><span class="p">(</span><span class="n">seed1</span><span class="p">,</span> <span class="n">mask1</span><span class="p">,</span> <span class="n">n1</span><span class="p">)</span>
+    <span class="n">lfsr2</span><span class="o">=</span><span class="n">lfsr</span><span class="p">(</span><span class="n">seed3</span><span class="p">,</span> <span class="n">mask2</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
+    <span class="n">cipher</span> <span class="o">=</span> <span class="n">generator</span><span class="p">(</span><span class="n">lfsr1</span><span class="p">,</span> <span class="n">lfsr2</span><span class="p">,</span> <span class="n">magic</span><span class="p">)</span>
+    <span class="n">encrypt</span><span class="p">(</span><span class="n">cipher</span><span class="p">,</span> <span class="s">"MTk4NC0xMi0yNQ==_76ff.txt"</span><span class="p">,</span> <span class="s">"MTk4NC0xMi0yNQ==_76ff.enc"</span><span class="p">)</span>
+    <span class="c1"># flag in it?
+</span>    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'hint=</span><span class="si">{</span><span class="n">magic</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="c1"># hint = 15193544052573546419
+</span>
+<span class="n">problem1</span><span class="p">()</span>
+<span class="n">problem2</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>We are given two encrypted files encrypted with some sort of LFSR stream cipher. We are able to get 128 known bits of each of the generator outputs (via the date header).</p>
+
+<h3 id="solution-1">solution</h3>
+
+<p>Since we are given almost no information about the LFSRs apart from the length, we’ll need to figure out the masks and eventually therefore the seeds. We’ll focus on problem1 first.</p>
+
+<h4 id="problem1">problem1</h4>
+
+<p>After playing around a bit with the <code class="language-plaintext highlighter-rouge">confusion</code> function in the generator, we can notice two things.</p>
+
+<p>First, notice that the <code class="language-plaintext highlighter-rouge">cnt</code> variable only depends on the number of bits set in the <code class="language-plaintext highlighter-rouge">magic</code> variable. In the case of problem1, we definitely know how many 1 bits are set, it is only 1. This means that the end result of <code class="language-plaintext highlighter-rouge">cnt</code> will be 1, and so the output at the end will be xored with c1.</p>
+
+<p>Secondly, notice that in the <code class="language-plaintext highlighter-rouge">malicious_magic</code> function, the sum of the <code class="language-plaintext highlighter-rouge">now</code> variables is equal to magic, therefore the final output will eventually be xored with <code class="language-plaintext highlighter-rouge">magic</code>.</p>
+
+<p>Combining both of these together, we can see that the eventual output of <code class="language-plaintext highlighter-rouge">confusion(c1, c2)</code> will equal:<code class="language-plaintext highlighter-rouge">output = magic ^ c1 ^ c2 ^ c1 ^ magic = c2</code>, so we are directly getting output of the 2nd generator! Notably, this generator is incredibly short, with a length of 12. Given 128 bits, we can use the Berklamp-Welch algorithm to recover the mask/feedback polynomial, and then invert the LFSR to get the seed. (Alternatively, you could probably just bruteforce both the mask and seed simultaneously since combined they are only 24 bits, but I chose not to do this.)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">class</span> <span class="nc">lfsr</span><span class="p">():</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">length</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="n">length</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">seed</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span>
+
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">next_state</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">state</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">state</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">mask</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="p">.</span><span class="n">length_mask</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">^^=</span> <span class="p">(</span><span class="n">i</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">&gt;&gt;</span> <span class="mi">1</span>
+        <span class="n">next_state</span> <span class="o">^^=</span> <span class="n">output</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">next_state</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+    <span class="k">def</span> <span class="nf">getrandbit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nbit</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbit</span><span class="p">):</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="n">output</span> <span class="o">&lt;&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^^</span> <span class="bp">self</span><span class="p">.</span><span class="nb">next</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">output</span>
+    
+<span class="n">ct</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">"MTk4NC0wNC0wMQ==_6d30.enc"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">).</span><span class="n">read</span><span class="p">()[:</span><span class="mi">16</span><span class="p">])</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="sa">b</span><span class="s">"Date: 1984-04-01"</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">pt</span> <span class="o">^^</span> <span class="n">ct</span>
+<span class="n">lfsr2out</span> <span class="o">=</span> <span class="p">[</span><span class="n">GF</span><span class="p">(</span><span class="mi">2</span><span class="p">)(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="s">"{:0128b}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">out</span><span class="p">)]</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">sage</span><span class="p">.</span><span class="n">matrix</span><span class="p">.</span><span class="n">berlekamp_massey</span><span class="p">.</span><span class="n">berlekamp_massey</span><span class="p">(</span><span class="n">lfsr2out</span><span class="p">)</span>
+<span class="n">M</span> <span class="o">=</span> <span class="n">companion_matrix</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">'bottom'</span><span class="p">)</span>
+<span class="n">v0</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="n">lfsr2out</span><span class="p">[:</span><span class="mi">12</span><span class="p">])</span>
+<span class="n">seed2</span> <span class="o">=</span> <span class="n">M</span><span class="o">^-</span><span class="mi">12</span> <span class="o">*</span> <span class="n">v0</span>
+<span class="n">seed2</span> <span class="o">=</span> <span class="n">ZZ</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">seed2</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">base</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">seed2</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">_mask2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">^</span><span class="mi">12</span><span class="p">):</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">lfsr</span><span class="p">(</span><span class="n">seed2</span><span class="p">,</span> <span class="n">_mask2</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">l</span><span class="p">.</span><span class="n">getrandbit</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span> <span class="o">==</span> <span class="n">out</span><span class="p">:</span>
+        <span class="n">mask2</span> <span class="o">=</span> <span class="n">_mask2</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">mask2</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2989 - seed2
+2053 - mask2
+</code></pre></div></div>
+
+<p>(Sidenote: I wasn’t really sure how the mask corresponded to the feedback polynomial I was getting in Sage, so I ended up just bruteforcing the mask with the correct seed until the same output was given. I believe it was something to do with the +1 term in the polynomial, although I’m not sure)</p>
+
+<h4 id="problem2">problem2</h4>
+
+<p>Now that we have the value for <code class="language-plaintext highlighter-rouge">seed2</code>, we can go look at problem2. This time, the hint has an even number of 1 bit set, so the resulting <code class="language-plaintext highlighter-rouge">cnt</code> will be 0, and then our output will be:<code class="language-plaintext highlighter-rouge">output = magic ^ c1 ^ c2 ^ magic = c1 ^ c2</code>.</p>
+
+<p>We’ll ideally want to recover the feedback polynomial for the first LFSR, and we can attempt to do this by bruteforcing the seed for the second LFSR, which is only a 12 bit bruteforce. For each seed, we’ll calculate the output stream of the 1st generator, and then apply the Berklamp-Welch algorithm again to recover a possible feedback polynomial. Then, using this feedback polynomial, we can advance the keystream and decrypt the full file, and check if it contains the flag.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="n">ct</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">"MTk4NC0xMi0yNQ==_76ff.enc"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">).</span><span class="n">read</span><span class="p">()[:</span><span class="mi">16</span><span class="p">])</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="sa">b</span><span class="s">"Date: 1984-12-25"</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">pt</span> <span class="o">^^</span> <span class="n">ct</span>
+<span class="n">fullct</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"MTk4NC0xMi0yNQ==_76ff.enc"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">).</span><span class="n">read</span><span class="p">()</span>
+<span class="n">ctlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fullct</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">GF</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">xor</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">_a</span> <span class="o">^^</span> <span class="n">_b</span> <span class="k">for</span> <span class="n">_a</span><span class="p">,</span> <span class="n">_b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)])</span>
+
+<span class="k">for</span> <span class="n">seed3</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">^</span><span class="mi">12</span><span class="p">)):</span>
+    <span class="n">l</span> <span class="o">=</span> <span class="n">lfsr</span><span class="p">(</span><span class="n">seed3</span><span class="p">,</span> <span class="n">mask2</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+    <span class="n">l2out</span> <span class="o">=</span> <span class="n">l</span><span class="p">.</span><span class="n">getrandbit</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">l1out</span> <span class="o">=</span> <span class="n">l2out</span> <span class="o">^^</span> <span class="n">out</span>
+    <span class="n">lfsr1out</span> <span class="o">=</span> <span class="p">[</span><span class="n">F</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="s">"{:0128b}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">l1out</span><span class="p">)]</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">sage</span><span class="p">.</span><span class="n">matrix</span><span class="p">.</span><span class="n">berlekamp_massey</span><span class="p">.</span><span class="n">berlekamp_massey</span><span class="p">(</span><span class="n">lfsr1out</span><span class="p">)</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">companion_matrix</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="s">'bottom'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">M</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">64</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">v0</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="n">lfsr1out</span><span class="p">[:</span><span class="mi">64</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">fullct</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">64</span><span class="p">):</span>
+            <span class="n">v</span> <span class="o">+=</span> <span class="p">((</span><span class="n">M</span><span class="o">^</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">v0</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">fullct</span><span class="p">)</span> <span class="o">*</span> <span class="mi">8</span><span class="p">]</span>
+        <span class="n">keystream1</span> <span class="o">=</span> <span class="n">ZZ</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">base</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">lfsr</span><span class="p">(</span><span class="n">seed3</span><span class="p">,</span> <span class="n">mask2</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+        <span class="n">keystream2</span> <span class="o">=</span> <span class="n">l</span><span class="p">.</span><span class="n">getrandbit</span><span class="p">(</span><span class="n">ctlen</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">k1</span> <span class="o">=</span> <span class="n">long_to_bytes</span><span class="p">(</span><span class="n">keystream1</span><span class="p">,</span> <span class="n">ctlen</span><span class="p">)</span>
+        <span class="n">k2</span> <span class="o">=</span> <span class="n">long_to_bytes</span><span class="p">(</span><span class="n">keystream2</span><span class="p">,</span> <span class="n">ctlen</span><span class="p">)</span>
+        <span class="n">plaintext</span> <span class="o">=</span> <span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">k1</span><span class="p">,</span> <span class="n">k2</span><span class="p">),</span> <span class="n">fullct</span><span class="p">))</span>
+        <span class="k">if</span> <span class="sa">b</span><span class="s">"SUSCTF"</span> <span class="ow">in</span> <span class="n">plaintext</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">plaintext</span><span class="p">.</span><span class="n">decode</span><span class="p">())</span>
+            <span class="k">break</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Date: 1984-12-25
+Though the hunger pangs were no longer so exquisite, he realized that he was weak.  He was compelled to pause for frequent rests, when he attacked the muskeg berries and rush-grass patches.  His tongue felt dry and large, as though covered with a fine hairy growth, and it tasted bitter in his mouth.  His heart gave him a great deal of trouble.  When he had travelled a few minutes it would begin a remorseless thump, thump, thump, and then leap up and away in a painful flutter of beats that choked him and made him go faint and dizzy.
+In the middle of the day he found two minnows in a large pool.  It was impossible to bale it, but he was calmer now and managed to catch them in his tin bucket.  They were no longer than his little finger, but he was not particularly hungry.  The dull ache in his stomach had been growing duller and fainter.  It seemed almost that his stomach was dozing.  He ate the fish raw, masticating with painstaking care, for the eating was an act of pure reason.  While he had no desire to eat, he knew that he must eat to live.
+In the evening he caught three more minnows, eating two and saving the third for breakfast.  The sun had dried stray shreds of moss, and he was able to warm himself with hot water.  He had not covered more than ten miles that day; and the next day, travelling whenever his heart permitted him, he covered no more than five miles.  But his stomach did not give him the slightest uneasiness.  It had gone to sleep.  He was in a strange country, too, and the caribou were growing more plentiful, also the wolves.  Often their yelps drifted across the desolation, and once he saw three of them slinking away before his path.
+The content is an excerpt from Love of Life, by Jack London. The problem is mainly about LFSR and I've tried not to make it hard (with the cost of some running time, actually). Your flag is SUSCTF{Thx_f0r_y0uR_P4ti3nce_:)_GoodLuck!_1bc9b80142c24fef610b8d770b500009} and I hope you will enjoy our game. You'll find this problem so ez while solving other problems, which is created by --.
+</code></pre></div></div>
+
+<h4 id="flag-susctfthx_f0r_y0ur_p4ti3nce__goodluck_1bc9b80142c24fef610b8d770b500009">Flag: <code class="language-plaintext highlighter-rouge">SUSCTF{Thx_f0r_y0uR_P4ti3nce_:)_GoodLuck!_1bc9b80142c24fef610b8d770b500009}</code></h4>
+
+
+
+</article>
+
+
+
+<div class="post-pagination">
+  
+    <span class="post-pagination-item newer"></span>
+  
+
+  
+    <a class="post-pagination-item older" href="/posts/2022-01-02-tetctf">
+      <span class="post-pagination-title">TetCTF 2022 - fault
+</span> <i class="fas fa-chevron-right"></i>
+    </a>
+  
+</div>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>
