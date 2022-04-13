@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/normalize.css">
+  <link rel="stylesheet" href="/assets/css/ockham.css">
+  <script async src="/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> HackPack CTF 2022 | willwam845 </title>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/about/" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+      <li">
+        <a href="/projects/" class="sidebar-nav-item ">
+          projects
+        </a>
+      </li>
+    
+      <li">
+        <a href="/archive/" class="sidebar-nav-item ">
+          archive
+        </a>
+      </li>
+    
+      <li">
+        <a href="/tags/" class="sidebar-nav-item ">
+          tags
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">HackPack CTF 2022</h1>
+  <div class="post-meta">
+    <time datetime="2022-04-13T00:00:00+01:00" itemprop="datePublished">
+      13 Apr 2022
+    </time></div>
+
+  <p>Thanks for the fun challenges <a href="https://www.sebven.com">@Polymero</a>!</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><strong>Challenge Name</strong></th>
+      <th style="text-align: center">Tags</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><a href="#repeating-offence">repeating offence</a></td>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">homomorphic</code> <code class="language-plaintext highlighter-rouge">rsa</code> <code class="language-plaintext highlighter-rouge">pallier</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><a href="#pai3">P(ai)^3</a></td>
+      <td style="text-align: center"><code class="language-plaintext highlighter-rouge">pallier</code> <code class="language-plaintext highlighter-rouge">faulty</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h1 id="repeating-offence">repeating offence</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">getPrime</span><span class="p">,</span> <span class="n">inverse</span><span class="p">,</span> <span class="n">GCD</span>
+<span class="kn">from</span> <span class="nn">secrets</span> <span class="kn">import</span> <span class="n">randbelow</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="p">,</span> <span class="n">hashlib</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'flag.txt'</span><span class="p">,</span><span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">FLAG</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">decode</span><span class="p">().</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">f</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">RSA_then_Paillier</span><span class="p">:</span>
+    <span class="s">""" Layered Cipher of RSA : Zn -&gt; Zn then Paillier : Zn -&gt; Zn2. """</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="c1"># Class parameters
+</span>        <span class="n">P</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="n">domain</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">HISTORY</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># RSA public key
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">E</span> <span class="o">=</span> <span class="mh">0x10001</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">P</span> <span class="o">*</span> <span class="n">Q</span>
+
+        <span class="c1"># RSA private key
+</span>        <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">Q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
+
+        <span class="c1"># Paillier public key
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">randbelow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="c1"># Paillier private key
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">F</span> <span class="o">//</span> <span class="n">GCD</span><span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">G</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># RSA
+</span>        <span class="n">cip_rsa</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="c1"># Paillier
+</span>        <span class="n">g_m</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">G</span><span class="p">,</span> <span class="n">cip_rsa</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">r_n</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">randbelow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">),</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">cip</span> <span class="o">=</span> <span class="p">(</span><span class="n">g_m</span> <span class="o">*</span> <span class="n">r_n</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="c1"># Update HISTORY
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">HISTORY</span> <span class="o">+=</span> <span class="p">[</span><span class="n">hashlib</span><span class="p">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">cip</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)).</span><span class="n">hexdigest</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">cip</span>
+
+
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cip</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># Check HISTORY
+</span>        <span class="k">if</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">cip</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)).</span><span class="n">hexdigest</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">HISTORY</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># Paillier
+</span>        <span class="n">cip_rsa</span> <span class="o">=</span> <span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="n">cip</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">U</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span>
+
+        <span class="c1"># RSA
+</span>        <span class="k">return</span> <span class="nb">pow</span><span class="p">(</span><span class="n">cip_rsa</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">D</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">Paillier_then_RSA</span><span class="p">:</span>
+    <span class="s">""" Layered Cipher of Paillier : Zn -&gt; Zn2 then RSA : Zn2 -&gt; Zn2. """</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="c1"># Class parameters
+</span>        <span class="n">P</span><span class="p">,</span> <span class="n">Q</span> <span class="o">=</span> <span class="n">domain</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">HISTORY</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># RSA public key
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">E</span> <span class="o">=</span> <span class="mh">0x10001</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">=</span> <span class="n">P</span> <span class="o">*</span> <span class="n">Q</span>
+
+        <span class="c1"># RSA private key
+</span>        <span class="n">F</span> <span class="o">=</span> <span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">Q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">E</span><span class="p">,</span> <span class="n">F</span><span class="p">)</span>
+
+        <span class="c1"># Paillier public key
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">randbelow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="c1"># Paillier private key
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">L</span> <span class="o">=</span> <span class="n">F</span> <span class="o">//</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">inverse</span><span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">G</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># Paillier
+</span>        <span class="n">g_m</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">G</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">r_n</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">randbelow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">),</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+        <span class="n">cip_pai</span> <span class="o">=</span> <span class="p">(</span><span class="n">g_m</span> <span class="o">*</span> <span class="n">r_n</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="c1"># RSA
+</span>        <span class="n">cip</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">cip_pai</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">E</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="c1"># Update HISTORY
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">HISTORY</span> <span class="o">+=</span> <span class="p">[</span><span class="n">hashlib</span><span class="p">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">cip</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)).</span><span class="n">hexdigest</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">cip</span>
+
+
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cip</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="c1"># Check HISTORY
+</span>        <span class="k">if</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">cip</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)).</span><span class="n">hexdigest</span><span class="p">()</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">.</span><span class="n">HISTORY</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1"># RSA
+</span>        <span class="n">cip_pai</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">cip</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">D</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span>
+
+        <span class="c1"># Paillier
+</span>        <span class="k">return</span> <span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="n">cip_pai</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">U</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="p">.</span><span class="n">N</span>
+    
+<span class="n">DOMAIN</span> <span class="o">=</span> <span class="p">[</span><span class="n">getPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+
+<span class="n">STAGE_1</span><span class="p">,</span> <span class="n">STAGE_2</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">False</span>
+<span class="n">RTP</span> <span class="o">=</span> <span class="n">RSA_then_Paillier</span><span class="p">(</span><span class="n">DOMAIN</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  STAGE 1 :: RSA-then-Paillier</span><span class="se">\n</span><span class="s">|</span><span class="se">\n</span><span class="s">|   N: {}</span><span class="se">\n</span><span class="s">|   G: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">RTP</span><span class="p">.</span><span class="n">N</span><span class="p">,</span> <span class="n">RTP</span><span class="p">.</span><span class="n">G</span><span class="p">))</span>
+
+<span class="n">RTP_PWD</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">32</span><span class="p">).</span><span class="nb">hex</span><span class="p">().</span><span class="n">encode</span><span class="p">(),</span> <span class="s">'big'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  RTP(Password): {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">RTP</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">RTP_PWD</span><span class="p">)))</span>
+
+<span class="k">while</span> <span class="n">STAGE_1</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|</span><span class="se">\n</span><span class="s">|  MENU:</span><span class="se">\n</span><span class="s">|   [E]ncrypt</span><span class="se">\n</span><span class="s">|   [D]ecrypt</span><span class="se">\n</span><span class="s">|   [S]ubmit Password"</span><span class="p">)</span>
+    <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  &gt;&gt;&gt; "</span><span class="p">).</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">'e'</span><span class="p">:</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  MSG(int): "</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  CIP -&gt;"</span><span class="p">,</span> <span class="n">RTP</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">user_input</span><span class="p">)))</span>            
+    <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">'d'</span><span class="p">:</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  CIP(int): "</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  MSG -&gt;"</span><span class="p">,</span> <span class="n">RTP</span><span class="p">.</span><span class="n">decrypt</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">user_input</span><span class="p">)))</span>    
+    <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">'s'</span><span class="p">:</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  PWD(int): "</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user_input</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">RTP_PWD</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|</span><span class="se">\n</span><span class="s">|  Correct ~ On to Stage 2!</span><span class="se">\n</span><span class="s">|"</span><span class="p">)</span>
+            <span class="n">STAGE_2</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">break</span>
+
+<span class="k">if</span> <span class="n">STAGE_2</span><span class="p">:</span>
+    <span class="n">PTR</span> <span class="o">=</span> <span class="n">Paillier_then_RSA</span><span class="p">(</span><span class="n">DOMAIN</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  STAGE 2 :: Paillier-then-RSA</span><span class="se">\n</span><span class="s">|   N: {}</span><span class="se">\n</span><span class="s">|   G: {}</span><span class="se">\n</span><span class="s">|"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">RTP</span><span class="p">.</span><span class="n">N</span><span class="p">,</span> <span class="n">RTP</span><span class="p">.</span><span class="n">G</span><span class="p">))</span>
+    <span class="n">PTR_PWD</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">32</span><span class="p">).</span><span class="nb">hex</span><span class="p">().</span><span class="n">encode</span><span class="p">(),</span> <span class="s">'big'</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  PTR(Password): {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">PTR</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">PTR_PWD</span><span class="p">)))</span>
+
+<span class="k">while</span> <span class="n">STAGE_2</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|</span><span class="se">\n</span><span class="s">|  MENU:</span><span class="se">\n</span><span class="s">|   [E]ncrypt</span><span class="se">\n</span><span class="s">|   [D]ecrypt</span><span class="se">\n</span><span class="s">|   [S]ubmit Password"</span><span class="p">)</span>
+    <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  &gt;&gt;&gt; "</span><span class="p">).</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">'e'</span><span class="p">:</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  MSG(int): "</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  CIP -&gt;"</span><span class="p">,</span> <span class="n">PTR</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">user_input</span><span class="p">)))</span>            
+    <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">'d'</span><span class="p">:</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  CIP(int): "</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  MSG -&gt;"</span><span class="p">,</span> <span class="n">PTR</span><span class="p">.</span><span class="n">decrypt</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">user_input</span><span class="p">)))</span>    
+    <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">'s'</span><span class="p">:</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  PWD(int): "</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">user_input</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="n">PTR_PWD</span><span class="p">):</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|</span><span class="se">\n</span><span class="s">|  Correct ~ Here's your flag: {}</span><span class="se">\n</span><span class="s">|"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">FLAG</span><span class="p">))</span>
+            <span class="k">break</span>
+
+</code></pre></div></div>
+
+<p>We’re given a service where we need to recover two passwords after being given the encryption of them. They are encrypted using a combination of the RSA and Pallier cryptosystems, the first being RSA first, then Pallier, and the second Pallier first, then RSA. We are able to encrypt and decrypt arbitrary messages, however we are not able to decrypt a message that has already been encrypted before, which includes the passwords.</p>
+
+<h2 id="solution">solution</h2>
+
+<p>We denote RSA encryption as $R(x)$, and Pallier encryption as $P(x)$</p>
+
+<p>The main idea for this challenge is that both the RSA and Pallier cryptosystems are homomorphic. This gives us a few properties of them that we can abuse, namely:</p>
+
+<ul>
+  <li>$R(a) * R(b) = R(a * b)$</li>
+  <li>$R(a)^{x} = R(a^x)$</li>
+  <li>$P(a) * P(b) = P(a + b)$</li>
+  <li>$P(a)^{x} = P(a * x)$</li>
+</ul>
+
+<p>These will prove very useful for us later. Also keep in mind that we can encrypt using either one of RSA or Pallier individually, as these are public key cryptosystems, and we are luckily provided with the public key.</p>
+
+<p>Anyway, let’s look at the two stages.</p>
+
+<h3 id="stage-1">stage 1</h3>
+
+<p>We are given $C = P(R(p))$, where we need to find $p$.</p>
+
+<p>The idea for this stage is to raise $C$ to the power of $R(x)$ for some known $x$. Then, using the properties above:</p>
+
+<p>$C^{R(x)} = P(R(p))^{R(x)} = P(R(p) * R(x)) = P(R(p*x))$</p>
+
+<p>and then we can ask the server to decrypt that to get $p * x$. Since we know $x$, we divide to get $p$.</p>
+
+<h3 id="stage-2">stage 2</h3>
+
+<p>We are given $C = R(P(p))$, where we need to find $p$.</p>
+
+<p>For this stage, we observe what happens when we multiply encryptions together:</p>
+
+<p>$R(P(a)) * R(P(b)) = R(P(a) * P(b)) = R(P(a + b))$</p>
+
+<p>So, notice that we can set $a = p$ and then $b$ to be some known value. We encrypt $b$ and then multiply the encryption with the flag encryption to get $R(P(p + b))$. We ask the server to decrypt this to get $p + b$, and then since we know $b$, subtract it to get $p$.</p>
+
+<p>Submitting these passwords gives us the flag. Solve script below:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"cha.hackpack.club"</span><span class="p">,</span> <span class="mi">10996</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"&gt;&gt;&gt;"</span><span class="p">,</span> <span class="s">"E"</span><span class="p">)</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"MSG(int):"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"CIP -&gt;"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="n">cip</span><span class="p">):</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"&gt;&gt;&gt;"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">)</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"CIP(int):"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cip</span><span class="p">))</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"MSG -&gt;"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">submit</span><span class="p">(</span><span class="n">password</span><span class="p">):</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"&gt;&gt;&gt;"</span><span class="p">,</span> <span class="s">"S"</span><span class="p">)</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"PWD(int):"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">password</span><span class="p">))</span>
+
+<span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"N:"</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+
+<span class="c1"># Stage 1
+</span><span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"(Password):"</span><span class="p">)</span>
+<span class="n">c1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+<span class="n">Rb</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mh">0x10001</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">C</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">Rb</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">passx</span> <span class="o">=</span> <span class="n">decrypt</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+<span class="n">password</span> <span class="o">=</span> <span class="n">passx</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="n">submit</span><span class="p">(</span><span class="n">password</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># Stage 2
+</span><span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"(Password):"</span><span class="p">)</span>
+<span class="n">c2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+<span class="n">Rb</span> <span class="o">=</span> <span class="n">encrypt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">password</span> <span class="o">=</span> <span class="n">decrypt</span><span class="p">((</span><span class="n">Rb</span> <span class="o">*</span> <span class="n">c2</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
+<span class="n">submit</span><span class="p">(</span><span class="n">password</span><span class="p">)</span>
+
+<span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"flag:"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">().</span><span class="n">decode</span><span class="p">())</span>
+</code></pre></div></div>
+
+<h4 id="flag-flags4dly_f0r_y0u_j41l_t1m3_1s_n0t_h0m0m0rph1c4lly_r3duc1bl3">Flag: <code class="language-plaintext highlighter-rouge">flag{s4dly_f0r_y0u_j41l_t1m3_1s_n0t_h0m0m0rph1c4lly_r3duc1bl3}</code></h4>
+
+<h1 id="pai3">P(ai)^3</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">getPrime</span><span class="p">,</span> <span class="n">inverse</span>
+<span class="kn">from</span> <span class="nn">secrets</span> <span class="kn">import</span> <span class="n">randbelow</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"flag.txt"</span><span class="p">,</span><span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">FLAG</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">().</span><span class="n">decode</span><span class="p">()</span>
+    <span class="n">f</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">MENU</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"""|
+|  MENU:
+|   [E]ncrypt
+|   [D]ecrypt
+|"""</span>
+
+<span class="k">class</span> <span class="nc">Paiaiai</span><span class="p">:</span>
+    <span class="s">""" My first Paillier implementation! So proud of it. ^ w ^ """</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Key generation
+</span>        <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="p">[</span><span class="n">getPrime</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+        <span class="c1"># Public key
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">pub</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">'n'</span>  <span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+            <span class="s">'gp'</span> <span class="p">:</span> <span class="nb">pow</span><span class="p">(</span><span class="n">randbelow</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">p</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+            <span class="s">'gq'</span> <span class="p">:</span> <span class="nb">pow</span><span class="p">(</span><span class="n">randbelow</span><span class="p">(</span><span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">q</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="c1"># Private key
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">priv</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">'la'</span> <span class="p">:</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="s">'mu'</span> <span class="p">:</span> <span class="n">inverse</span><span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'gp'</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'gq'</span><span class="p">],</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="p">}</span>
+        
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">m_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">m</span><span class="p">.</span><span class="n">encode</span><span class="p">(),</span> <span class="s">'big'</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">([</span><span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'gp'</span><span class="p">],</span><span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'gq'</span><span class="p">]][</span><span class="n">randbelow</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span> <span class="n">m_int</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> 
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">randbelow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]),</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">],</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">g</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+    
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">cl</span> <span class="o">=</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">priv</span><span class="p">[</span><span class="s">'la'</span><span class="p">],</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">cl</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">priv</span><span class="p">[</span><span class="s">'mu'</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span>
+
+<span class="n">pai</span> <span class="o">=</span> <span class="n">Paiaiai</span><span class="p">()</span>
+
+<span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">MENU</span><span class="p">)</span>
+    <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|  &gt;&gt;&gt; "</span><span class="p">).</span><span class="n">lower</span><span class="p">().</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">'e'</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  ENCRYPT:"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"|   [F]lag"</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"|   [M]essage"</span><span class="p">)</span>
+        <span class="n">subchoice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  &gt;&gt;&gt; "</span><span class="p">).</span><span class="n">lower</span><span class="p">().</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">subchoice</span> <span class="o">==</span> <span class="s">'f'</span><span class="p">:</span>
+            <span class="n">enc_flag</span> <span class="o">=</span> <span class="n">pai</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">FLAG</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  FLAG:"</span><span class="p">,</span> <span class="n">enc_flag</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">subchoice</span> <span class="o">==</span> <span class="s">'m'</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  MSG: str</span><span class="se">\n</span><span class="s">|   &gt; "</span><span class="p">)</span>
+            <span class="n">cip</span> <span class="o">=</span> <span class="n">pai</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  CIP:"</span><span class="p">,</span> <span class="n">cip</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="s">'d'</span><span class="p">:</span>
+            <span class="n">cip</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  CIP: int</span><span class="se">\n</span><span class="s">|   &gt; "</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">pai</span><span class="p">.</span><span class="n">decrypt</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">cip</span><span class="p">))</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"|</span><span class="se">\n</span><span class="s">|  MSG:"</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We’re given a service that implements what appears to be a Pallier cryptosystem, however the encrypt function is faulty and will use either $g_p$ or  $g_q$ instead of the actual $g = g_p * g_q$ from which the private key is derived. We can arbitrarily encrypt and decrypt messages, or the flag, however we are given no information about the public key.</p>
+
+<h2 id="solution-1">solution</h2>
+
+<p>Not having the public key makes this a little tricky, so we’ll start by trying to at least recover some of that.</p>
+
+<p>The main function we need to look at for this challenge is the decrypt function, which is shown below:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">cl</span> <span class="o">=</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">priv</span><span class="p">[</span><span class="s">'la'</span><span class="p">],</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">cl</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">priv</span><span class="p">[</span><span class="s">'mu'</span><span class="p">])</span> <span class="o">%</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<h3 id="recovering-n">recovering $n$</h3>
+
+<p>We’ll start by observing what happens when we decrypt a message $a$, and it’s square, $a^{2}$</p>
+
+<p>The first step is to raise each to the power of $\lambda$ (<code class="language-plaintext highlighter-rouge">la</code>), which we know is the Euler totient of $n$, therefore raising anything to the power of it will give a value of $1 \bmod n$. Here we take it mod $n^{2}$, so our result will be of the form $kn + 1$, where $k$ is some unknown value.</p>
+
+\[a^{\lambda} = k_1n + 1\\
+(a^{2})^{\lambda} = a^{2\lambda} = k_2n + 1\\\]
+
+<p>Now, we know that $(a^{\lambda})^2 = a^{2\lambda}$, so we’ll square $k_1n+1$ and set it equal to $k_2n + 1$, and hopefully we can write $k_2$ in terms of $k_1$ or vice versa.</p>
+
+\[\begin{eqnarray}
+(k_1n+1)^2 &amp;=&amp; k_1^2n^2 + 2k_1n + 1 \\
+k_1^2n^2 + 2k_1n + 1&amp;=&amp; k_2n + 1\\
+k_1^2n + 2k_1 &amp;=&amp; k_2
+\end{eqnarray}\]
+
+<p>Now we’ll finish the decryption and see what value is actually returned by subtracting 1, dividing by $n$ and multiplying by $\mu$ (<code class="language-plaintext highlighter-rouge">mu</code>):</p>
+
+\[\begin{eqnarray}
+cl_1 &amp;=&amp; \frac{k_1n + 1 - 1}{n} = k_1\\
+r_1 &amp;=&amp; \mu * k_1 \bmod n\\
+r_2 &amp;=&amp; \mu * k_2 \bmod n\\
+\end{eqnarray}\]
+
+<p>But remember, we have an expression for $k_2$ in terms of $k_1$, so let’s write that out:</p>
+
+\[\begin{eqnarray}
+r_1 &amp;=&amp; \mu * k_1 \bmod n\\
+r_2 &amp;=&amp; \mu * (k_1^2n + 2k_1) \bmod n \\
+&amp;=&amp; \mu * 2k_1 \bmod n\\
+\end{eqnarray}\]
+
+<p>Now we know that $r_1 * 2 = r_2$ if we decrypt $a$ and $a^2$. Since there is a possibility for $2 * r_1 &gt; n$, we’ll use this to recover $n$. If we find the returned $r_2 &lt; r_1$, we can recover $n$ by working out $2r_1 - r_2$</p>
+
+<h3 id="recovering-mu-mu">recovering $\mu$ (<code class="language-plaintext highlighter-rouge">mu</code>)</h3>
+
+<p>Now that we have recovered $n$, we’ll observe what happens when we decrypt $n$.</p>
+
+<p>$n^{\lambda} \equiv 0 \bmod n^2$, as $\lambda$ will always be even, and so $n^{\lambda}$ will always be a multiple of $n^{2}$. Then $cl = \lfloor{\frac{-1}{n}}\rfloor = -1$, and therefore $r = n - mu$. We have now recovered $mu$.</p>
+
+<h3 id="recovering-lambda-la">recovering $\lambda$ (<code class="language-plaintext highlighter-rouge">la</code>)</h3>
+
+<p>The last thing we would like to recover is $\lambda$, as this will allow us to factorize $n$, and also “decrypt” any message. We’ll do this by asking for the decryption of $n + 1$</p>
+
+<p>To see why this works, we need to look at the binomial expansion of $(1 + n)^k \bmod n^2$</p>
+
+<p>The binomial expansion is written as:</p>
+
+\[\sum^{k}_{x=0} {k\choose x}n^{x}\]
+
+<p>Notice that for $x &gt; 1$, all terms will be cancelled out by the $\bmod n^2$, regardless of what ${k\choose x}$ is. Therefore, for any $k$, we only need to worry about $x = 0, 1$. This results in the sum:</p>
+
+\[\begin{eqnarray}
+(1 + n)^k &amp;=&amp; {k\choose 0} + {k\choose 1}n\\
+&amp;=&amp; 1 + kn
+\end{eqnarray}\]
+
+<p>Therefore, $cl = \frac{1+ kn - 1}{n} = k$, and so $r = k * mu$. We know $\mu$, and we know $k = \lambda$, so we have recovered $\lambda$. This also allows us to factorize $n$, although it is not required for flag recovery.</p>
+
+<h3 id="flag-recovery">flag recovery</h3>
+
+<p>Our final step is to recover the flag with all the information we have. Let’s look at the encryption function:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">m_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">m</span><span class="p">.</span><span class="n">encode</span><span class="p">(),</span> <span class="s">'big'</span><span class="p">)</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">([</span><span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'gp'</span><span class="p">],</span><span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'gq'</span><span class="p">]][</span><span class="n">randbelow</span><span class="p">(</span><span class="mi">2</span><span class="p">)],</span> <span class="n">m_int</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> 
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">randbelow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]),</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">],</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">g</span> <span class="o">*</span> <span class="n">r</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'n'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+</code></pre></div></div>
+
+<p>and also briefly at the private key generation:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="bp">self</span><span class="p">.</span><span class="n">priv</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">'la'</span> <span class="p">:</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="s">'mu'</span> <span class="p">:</span> <span class="n">inverse</span><span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'gp'</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="p">.</span><span class="n">pub</span><span class="p">[</span><span class="s">'gq'</span><span class="p">],</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="p">}</span>
+</code></pre></div></div>
+
+<p>Notice that instead of using $g_p * g_q$ as the generator $g$, which is what the private key is derived from, we are using only one of $g_p$ or $g_q$. To get something that is decryptable, we would ideally want a ciphertext which uses $gp * gq$ as $g$.</p>
+
+<p>Luckily, it turns out we can make one ourselves! Notice that the $r$’s are pretty much arbitrary, as multiplying two $r$’s together will only give another potential $r$, and $g = {g_p^{flag}, g_q^{flag}}$. If we multiply these two together, we get $g = (g_p*g_q)^{flag}$, which is exactly what we need!</p>
+
+<p>Therefore, all we need to do is ask for a couple flag ciphertexts, multiply combinations of two of them together, and attempt to decrypt it using standard Pallier decryption. This should hopefully give us a flag after a couple of tries.</p>
+
+<p>Solve script below:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"cha.hackpack.club"</span><span class="p">,</span> <span class="mi">10997</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">decrypt_msg</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"&gt;&gt;&gt;"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">)</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"&gt;"</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"MSG: "</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">encrypt_flag</span><span class="p">():</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"&gt;&gt;&gt;"</span><span class="p">,</span> <span class="s">"E"</span><span class="p">)</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"&gt;&gt;&gt;"</span><span class="p">,</span> <span class="s">"F"</span><span class="p">)</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"FLAG: "</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># squaring message gives k, 2*k, subtract to get n
+</span><span class="k">while</span> <span class="ow">not</span> <span class="n">n</span><span class="p">:</span>
+    <span class="n">c1</span> <span class="o">=</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="n">c2</span> <span class="o">=</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">i</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">c1</span><span class="o">*</span><span class="mi">2</span> <span class="o">-</span> <span class="n">c2</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"n:"</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># asking for decryption of n gives n - mu
+</span><span class="n">mu</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># asking for decryptions of n+1 gives mu(p + q)
+</span><span class="n">mupq</span> <span class="o">=</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pplusq</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">decrypt_msg</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span> <span class="o">%</span> <span class="n">n</span>
+<span class="n">pplusq</span> <span class="o">%=</span> <span class="n">n</span>
+<span class="n">pplusq</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="n">la</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">pplusq</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="n">encrypt_flag</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+<span class="k">for</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="p">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span> <span class="c1"># hopefully we find one that uses gp, gq, then mu is correct
+</span>    <span class="n">c</span> <span class="o">=</span> <span class="n">c1</span> <span class="o">*</span> <span class="n">c2</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">mu</span><span class="o">*</span> <span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">la</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">//</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">long_to_bytes</span><span class="p">(</span><span class="n">pt</span><span class="o">%</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="sa">b</span><span class="s">"flag"</span> <span class="ow">in</span> <span class="n">flag</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="flag-flagp41_41_41_1_d0nt_th1nk_th1s_1s_wh4t_p41ll13r_1nt3nd3d_3h">Flag: <code class="language-plaintext highlighter-rouge">flag{p41_41_41_1_d0nt_th1nk_th1s_1s_wh4t_p41ll13r_1nt3nd3d_3h}</code></h4>
+
+
+</article>
+
+
+
+<div class="post-pagination">
+  
+    <span class="post-pagination-item newer"></span>
+  
+
+  
+    <a class="post-pagination-item older" href="/posts/2022-02-28-susctf">
+      <span class="post-pagination-title">SUSCTF 2022
+</span> <i class="fas fa-chevron-right"></i>
+    </a>
+  
+</div>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>
