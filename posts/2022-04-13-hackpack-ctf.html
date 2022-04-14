@@ -376,6 +376,10 @@
 
 <h4 id="flag-flags4dly_f0r_y0u_j41l_t1m3_1s_n0t_h0m0m0rph1c4lly_r3duc1bl3">Flag: <code class="language-plaintext highlighter-rouge">flag{s4dly_f0r_y0u_j41l_t1m3_1s_n0t_h0m0m0rph1c4lly_r3duc1bl3}</code></h4>
 
+<h3 id="unintended-solution">unintended solution</h3>
+
+<p>There’s actually a pretty trivial unintended solution to this challenge: notice that the server does not take mod $n^2$ when checking history, however it does (effectively) take mod $n^2$ when computing decryptions. Therefore, all we need to do to bypass the history check is ask for the decryptions of $C + n^2$, where $C$ is our encrypted password.</p>
+
 <h1 id="pai3">P(ai)^3</h1>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">getPrime</span><span class="p">,</span> <span class="n">inverse</span>
@@ -495,7 +499,7 @@ r_2 &amp;=&amp; \mu * (k_1^2n + 2k_1) \bmod n \\
 
 <p>Now that we have recovered $n$, we’ll observe what happens when we decrypt $n$.</p>
 
-<p>$n^{\lambda} \equiv 0 \bmod n^2$, as $\lambda$ will always be even, and so $n^{\lambda}$ will always be a multiple of $n^{2}$. Then $cl = \lfloor{\frac{-1}{n}}\rfloor = -1$, and therefore $r = n - mu$. We have now recovered $mu$.</p>
+<p>$n^{\lambda} \equiv 0 \bmod n^2$, as $\lambda$ will always be even, and so $n^{\lambda}$ will always be a multiple of $n^{2}$. Then $cl = \lfloor{\frac{-1}{n}}\rfloor = -1$, and therefore $r = -1 * \mu \bmod n = n - \mu$. We have now recovered $\mu$.</p>
 
 <h3 id="recovering-lambda-la">recovering $\lambda$ (<code class="language-plaintext highlighter-rouge">la</code>)</h3>
 
@@ -514,7 +518,7 @@ r_2 &amp;=&amp; \mu * (k_1^2n + 2k_1) \bmod n \\
 &amp;=&amp; 1 + kn
 \end{eqnarray}\]
 
-<p>Therefore, $cl = \frac{1+ kn - 1}{n} = k$, and so $r = k * mu$. We know $\mu$, and we know $k = \lambda$, so we have recovered $\lambda$. This also allows us to factorize $n$, although it is not required for flag recovery.</p>
+<p>Therefore, $cl = \frac{1+ kn - 1}{n} = k$, and so $r = k * \mu$. We know $\mu$, and we know $k = \lambda$, so we have recovered $\lambda$. This also allows us to factorize $n$, although it is not required for flag recovery.</p>
 
 <h3 id="flag-recovery">flag recovery</h3>
 
@@ -576,13 +580,8 @@ r_2 &amp;=&amp; \mu * (k_1^2n + 2k_1) \bmod n \\
 <span class="c1"># asking for decryption of n gives n - mu
 </span><span class="n">mu</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
 
-<span class="c1"># asking for decryptions of n+1 gives mu(p + q)
-</span><span class="n">mupq</span> <span class="o">=</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">pplusq</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">decrypt_msg</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span> <span class="o">%</span> <span class="n">n</span>
-<span class="n">pplusq</span> <span class="o">%=</span> <span class="n">n</span>
-<span class="n">pplusq</span> <span class="o">+=</span> <span class="mi">1</span>
-
-<span class="n">la</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">pplusq</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="c1"># asking for decryption of n + 1 gives mu*la
+</span><span class="n">la</span> <span class="o">=</span> <span class="n">decrypt_msg</span><span class="p">(</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span>
 
 <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span><span class="n">encrypt_flag</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
 <span class="k">for</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="p">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span> <span class="c1"># hopefully we find one that uses gp, gq, then mu is correct
