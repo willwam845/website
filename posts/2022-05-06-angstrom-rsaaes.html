@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/normalize.css">
+  <link rel="stylesheet" href="/assets/css/ockham.css">
+  <script async src="/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> angstromCTF 2022 - RSA-AES | willwam845 </title>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/about/" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+      <li">
+        <a href="/projects/" class="sidebar-nav-item ">
+          projects
+        </a>
+      </li>
+    
+      <li">
+        <a href="/archive/" class="sidebar-nav-item ">
+          archive
+        </a>
+      </li>
+    
+      <li">
+        <a href="/tags/" class="sidebar-nav-item ">
+          tags
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">angstromCTF 2022 - RSA-AES</h1>
+  <div class="post-meta">
+    <time datetime="2022-05-06T00:00:00+01:00" itemprop="datePublished">
+      06 May 2022
+    </time></div>
+
+  <p>This challenge is a sequel to the challenge RSA-OTP from angstromCTF 2020, which was one of my first CTFs, so this was a a nice sequel to a challenge I wasn’t capable of solving back then. Thanks to clam for writing it!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">bytes_to_long</span><span class="p">,</span> <span class="n">long_to_bytes</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.Padding</span> <span class="kn">import</span> <span class="n">pad</span>
+<span class="kn">from</span> <span class="nn">Crypto.Random</span> <span class="kn">import</span> <span class="n">get_random_bytes</span>
+<span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+<span class="kn">from</span> <span class="nn">secret</span> <span class="kn">import</span> <span class="n">flag</span><span class="p">,</span> <span class="n">d</span>
+
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">256</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mh">0xbb7bbd6bb62e0cbbc776f9ceb974eca6f3d30295d31caf456d9bec9b98822de3cb941d3a40a0fba531212f338e7677eb2e3ac05ff28629f248d0bc9f98950ce7e5e637c9764bb7f0b53c2532f3ce47ecbe1205172f8644f28f039cae6f127ccf1137ac88d77605782abe4560ae3473d9fb93886625a6caa7f3a5180836f460c98bbc60df911637fa3f52556fa12a376e3f5f87b5956b705e4e42a30ca38c79e7cd94c9b53a7b4344f2e9de06057da350f3cd9bd84f9af28e137e5190cbe90f046f74ce22f4cd747a1cc9812a1e057b97de39f664ab045700c40c9ce16cf1742d992c99e3537663ede6673f53fbb2f3c28679fb747ab9db9753e692ed353e3551</span>
+<span class="n">e</span> <span class="o">=</span> <span class="mh">0x10001</span>
+<span class="k">assert</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">e</span><span class="o">*</span><span class="n">d</span><span class="p">,</span><span class="n">n</span><span class="p">)</span><span class="o">==</span><span class="mi">2</span>
+
+<span class="n">enc</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">flag</span><span class="p">),</span><span class="n">e</span><span class="p">,</span><span class="n">n</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">enc</span><span class="p">)</span>
+
+<span class="n">k</span> <span class="o">=</span> <span class="n">get_random_bytes</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">iv</span> <span class="o">=</span> <span class="n">get_random_bytes</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">cipher</span> <span class="o">=</span> <span class="n">AES</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">AES</span><span class="p">.</span><span class="n">MODE_CBC</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+
+<span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+	<span class="k">try</span><span class="p">:</span>
+		<span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s">"Enter message to sign: "</span><span class="p">))</span>
+		<span class="k">assert</span><span class="p">(</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">)</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">"signed message (encrypted with military-grade aes-256-cbc encryption):"</span><span class="p">)</span>
+		<span class="k">print</span><span class="p">(</span><span class="n">cipher</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">pad</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">n</span><span class="p">)),</span><span class="mi">16</span><span class="p">)))</span>
+	<span class="k">except</span><span class="p">:</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">"bad input, exiting"</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>We get access to a server which encrypts the flag with RSA, and gives us an RSA decryption oracle, however all outputs are encrypted with AES-CBC mode, with random IV and key.</p>
+
+<h2 id="primitives">primitives</h2>
+
+<h3 id="homomorphic-rsa">homomorphic RSA</h3>
+
+<p>Recall that RSA is homomorphic, i.e. $a^e * b^e = (ab)^e$. Since we have $c = f^e$ as the encrypted flag, and we have the public key, we can get a decryption of $f * k$ if we ask to decrypt $c * k^e$.</p>
+
+<p>This is useful for a couple things, most notably if we set $k = 2^i$, as this allows us to bit shift the flag to the left, or increasing the bit length by $i$,</p>
+
+<h3 id="somewhat-accurate-bit-length-calculator">somewhat accurate bit length calculator</h3>
+
+<p>The idea for RSA-OTP was that the OTP leaked the precise bit length of the decrypted ciphertext. We have a similar primitive here, although we are going to have to use the first primitive to help us.</p>
+
+<p>Notice that we can recover the bit length of a given plaintext accurately provided the bit length is under 2040 (for reasons I will explain shortly).</p>
+
+<p>The idea here is that we can multiply the plaintext by 2 until we get a change in the number of blocks in the AES ciphertext. This allows us to determine when the number of bytes in the last block reaches 16, in which case the <code class="language-plaintext highlighter-rouge">pad</code> function will add another padding block, and so the number of blocks in the ciphertext will increase.</p>
+
+<p>However, this will not work if the bit length is above 2041. This is because for a plaintext of bit length 2041, the last block will have 16 bytes already, and so the last block will be a padding block. If we try to multiply the plaintext by 2 until we reach the next block, our plaintext will be of the size $2^{2041} * 2^{120} = 2^{2161}$, however the issue is that this is significantly larger than $n$, and so we will have to reduce this $\bmod n$. This means that the plaintext is no longer “accurate”, and we are unable to use the method as described above.</p>
+
+<p>Here’s a function to do that:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">recover_bitlen</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">):</span>
+    <span class="n">blocklen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">))</span> <span class="o">//</span> <span class="mi">16</span>
+    <span class="k">if</span> <span class="n">blocklen</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2048</span><span class="o">//</span><span class="mi">16</span><span class="p">):</span> <span class="c1"># this means it is &gt; 2041 bits:
+</span>        <span class="k">return</span> <span class="mi">2041</span>
+    <span class="n">lb</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ub</span> <span class="o">=</span> <span class="mi">128</span>
+    <span class="k">while</span> <span class="n">ub</span> <span class="o">-</span> <span class="n">lb</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># binary search to find when it changes
+</span>        <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">lb</span> <span class="o">+</span> <span class="n">ub</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">ciphertext</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="o">*</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">bl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">(</span><span class="n">ct</span> <span class="o">%</span> <span class="n">n</span><span class="p">))</span> <span class="o">//</span> <span class="mi">16</span>
+        <span class="k">if</span> <span class="n">bl</span> <span class="o">==</span> <span class="n">blocklen</span><span class="p">:</span>
+            <span class="n">lb</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ub</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="k">return</span> <span class="n">blocklen</span><span class="o">*</span><span class="mi">128</span> <span class="o">-</span> <span class="n">lb</span> <span class="o">-</span> <span class="mi">8</span>
+</code></pre></div></div>
+
+<p>This also allows us to recover the bit length of the flag, which is 1759 bits = 220 bytes.</p>
+
+<h2 id="solution-idea-1">solution idea 1</h2>
+
+<p>The solution idea here is similar to a solution to RSA-OTP, which is detailed <a href="https://ctf.0xff.re/2020/angstromctf_2020/rsa-otp">here</a>. The general idea is that we find some value $k$ such that:</p>
+
+\[kf \approx 2^{1024}\]
+
+<p>which we can determine based on seeing when the bit length changes from 1023 to 1024, and then dividing $2^{1024}$ by $k$ to get the flag.</p>
+
+<p>We can do a similar thing here, where we find $k$ such that:</p>
+
+\[kf \approx 2^{2041}\]
+
+<p>as we are only able to distinguish up to here. We can binary search $k$ based on the bit length, and then divide $2^{2041}$ by $k$ to hopefully recover the flag.</p>
+
+<p>An implementation of this is below:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">flagmin</span><span class="p">,</span> <span class="n">flagmax</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">1758</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">1759</span>
+<span class="n">lb</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">2041</span><span class="p">)</span><span class="o">//</span><span class="n">flagmax</span>
+<span class="n">ub</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">2041</span><span class="p">)</span><span class="o">//</span><span class="n">flagmin</span>
+
+<span class="k">while</span> <span class="n">ub</span> <span class="o">-</span> <span class="n">lb</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">lb</span> <span class="o">+</span> <span class="n">ub</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span>
+    <span class="n">bitlen</span> <span class="o">=</span> <span class="n">recover_bitlen</span><span class="p">(</span><span class="n">ct</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bitlen</span> <span class="o">==</span> <span class="mi">2041</span><span class="p">:</span>
+        <span class="n">ub</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lb</span> <span class="o">=</span> <span class="n">k</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">lb</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">2041</span> <span class="o">//</span> <span class="n">lb</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>b'actf{the_letters_in_rsa_and_aes_foryis\x17B\x8a\xbb)\x1d\x9c\xeeX\xd1\xae\xc2\xa8\xe4\xda%\x14\xb9)\xebc\xbei@:\xc5\x0eVD3_\xf4D\xd1\xbf\xdc\x92\xbf\x00\x9ci\xb8\xd7\xed2M\x06{3\x96\n\xee\x10u\xe6\x10\x95\x03P\xc4\x07\x92\xb2\x10J\x11\xf9Lo\x06\x9d\xeek\xe9/\x17\xd3\xd9\xb5E\x19\x7f1\xc4"f\xe7&amp;\x08&amp;\x98=\x8cC\x8a\xaf\xf28\xdeO\x19!\xf7#\xd6SS\nH\x82\xd5\x1c\xbe\xb5\\\xac\xbb\x10*\xb4K&lt;\xa9\xc2|\x94\xb0\xa5\xc4L\r\xae?pW\x02d\x8e\x7f5.t\xa5\xcc\xabd\xeb\xdeF\x92\x87\xfb\xb0\xd8\xb7g2\x0b\x9fR\x9f\xa42\x93\x12\xf3\xab\xb1\x7fI7"\x98"\x84|\xec`%\x8d2\x03'
+</code></pre></div></div>
+
+<p>Ouch, the flag is not accurate enough. We’ll need to find a better method, as we still have a very large portion of the flag to recover. Let’s think about some more primitives and also think about how this challenge differs from RSA-OTP.</p>
+
+<h2 id="more-primitives">more primitives</h2>
+
+<h3 id="aes-is-deterministic">AES is deterministic</h3>
+
+<p>The main difference between RSA-OTP and this challenge is that the OTP was randomly generated, however this time, AES is used, and AES is notably deterministic. This means that, the same plaintext with the same IV and key will encrypt to the same thing every single time.</p>
+
+<p>This allows us to compare encrypted blocks, and deduce whether they are the same or not, however we cannot “compare” blocks arithmetically.</p>
+
+<p>However, there is a very minor issue here. Notice that the cipher object is defined at the start, meaning the IV for each encryption will be effectively different. This isn’t really a problem however, as recall that in CBC mode, for blocks after the first, the IV is effectively the last block of ciphertext, which we will know. We can XOR this with a plaintext block that we choose, meaning the outputted ciphertext will always be the same value.</p>
+
+<p>An implementation of this is below:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">set_iv</span><span class="p">():</span> 
+    <span class="n">b</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># this is just a "fake" block so that we can recover the iv used for next round
+</span>    <span class="n">iv</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="o">-</span><span class="mi">16</span><span class="p">:]</span> <span class="c1"># we need to xor our thing with this so what's feeded into the AES is our chosen block
+</span>    <span class="n">newblock</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">bxor</span><span class="p">(</span><span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span> <span class="n">iv</span><span class="p">))</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">newblock</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">query</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span> <span class="c1"># this will always fix the iv
+</span></code></pre></div></div>
+
+<p>We will call this function every time before we query a value, as this allows us to compare blocks.</p>
+
+<h2 id="solution-idea-2">solution idea 2</h2>
+
+<p>Our idea will be similar to our initial idea, but since we need to be more accurate, we will instead find $k$ for some known $a$ such that:</p>
+
+\[kf \approx an\]
+
+<p>Now, to ensure we can actually do this, we need to choose $a$ in such a way that we can actually find $k$ without too much bruteforce.</p>
+
+<p>Using our approximation of the flag, we can work out upper and lower bounds for $k$, and double check that the first block of the encryption of $lb * f$ is the same as the encryption of $n$, (if we choose a too large value of $a$ without a good enough approximation for $f
+$, then the upper and lower bounds for $k$ will be not be accurate enough for us to be able to compare the block).</p>
+
+<p>We also need to check that the first block of the encryption of $ub * f$ is <strong>not</strong> the same as the encryption of $n$, as this indicates there is a $\bmod n$ being taken between these values at some point, which is the value we eventually want to find.</p>
+
+<p>We can use binary search to find the best approximation for $k$. If our guess for $k$ is too large, then $kf = an + b$, and so taken $\bmod n$, the first 128 bits will be the first 128 bits of $b$, which is unlikely to be the first 128 bits of $n$, and therefore the AES ciphertext block will be different. If our guess is too small, then $kf = an - b$, and so taken $\bmod n$, the first 128 bits will be of $n - b$, which will be the same as the bits of $n$. So, after each guess, we adjust our guess for $k$ accordingly, until we find a value for $k$ where $kf &lt; an$ and $(k+1)f &gt; an$, in which case we know we have the best approximation for $k$.</p>
+
+<p>After finding the best possible $k$, we can get an approximation for the flag by calculating $\frac{an}{k}$, and then after increasing $a$ with the new flag approximation, we repeat until we get the whole flag.</p>
+
+<p>Full solve script (with added comments for clarity) below:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">log</span><span class="p">,</span> <span class="n">floor</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">'challs.actf.co'</span><span class="p">,</span> <span class="mi">31500</span><span class="p">)</span>
+
+<span class="c1"># pow stuff
+</span><span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"work:"</span><span class="p">)</span>
+<span class="n">powcmd</span> <span class="o">=</span> <span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">().</span><span class="n">decode</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">os</span><span class="p">.</span><span class="n">system</span><span class="p">(</span><span class="n">powcmd</span> <span class="o">+</span> <span class="s">" &gt; pow.txt"</span><span class="p">)</span>
+<span class="n">s</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">"pow.txt"</span><span class="p">).</span><span class="n">read</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mh">0xbb7bbd6bb62e0cbbc776f9ceb974eca6f3d30295d31caf456d9bec9b98822de3cb941d3a40a0fba531212f338e7677eb2e3ac05ff28629f248d0bc9f98950ce7e5e637c9764bb7f0b53c2532f3ce47ecbe1205172f8644f28f039cae6f127ccf1137ac88d77605782abe4560ae3473d9fb93886625a6caa7f3a5180836f460c98bbc60df911637fa3f52556fa12a376e3f5f87b5956b705e4e42a30ca38c79e7cd94c9b53a7b4344f2e9de06057da350f3cd9bd84f9af28e137e5190cbe90f046f74ce22f4cd747a1cc9812a1e057b97de39f664ab045700c40c9ce16cf1742d992c99e3537663ede6673f53fbb2f3c28679fb747ab9db9753e692ed353e3551</span> 
+<span class="n">e</span> <span class="o">=</span> <span class="mh">0x10001</span>
+<span class="n">c</span> <span class="o">=</span> <span class="mi">8702343735025266604493255023455944506448203943421139140860292426782509680048873569587596911548140388664137318807031840409098358526949080521742044811655775937519290500584015066858945832554481838588845652546365303337275177311841968984511864709414904338587040274646253896911291865516895328016639201704613064462056129248165695806001948541939983934752397658730589917722952341689278968790138018539025744727334202968601465562656795710345742329370762196560147624069504644216320910078454455520823319751612174752365432199529820974601209221975964155055716974539394252799602068585830290371624396504384131654854623710049511046664</span>
+
+<span class="k">def</span> <span class="nf">bxor</span><span class="p">(</span><span class="n">ba1</span><span class="p">,</span> <span class="n">ba2</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">x</span><span class="o">^</span><span class="n">y</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ba1</span><span class="p">,</span> <span class="n">ba2</span><span class="p">)])</span>
+
+<span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendlineafter</span><span class="p">(</span><span class="s">"Enter message to sign: "</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">()</span>
+    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span> <span class="c1"># not safe but whatever
+</span>
+<span class="k">def</span> <span class="nf">recover_bitlen</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">):</span>
+    <span class="n">blocklen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">))</span> <span class="o">//</span> <span class="mi">16</span>
+    <span class="k">if</span> <span class="n">blocklen</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2048</span><span class="o">//</span><span class="mi">16</span><span class="p">):</span> <span class="c1"># this means it is &gt; 2041 bits:
+</span>        <span class="k">return</span> <span class="mi">2041</span>
+    <span class="n">lb</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ub</span> <span class="o">=</span> <span class="mi">128</span>
+    <span class="k">while</span> <span class="n">ub</span> <span class="o">-</span> <span class="n">lb</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># binary search to find when it changes
+</span>        <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">lb</span> <span class="o">+</span> <span class="n">ub</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+        <span class="n">ct</span> <span class="o">=</span> <span class="n">ciphertext</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">k</span><span class="o">*</span><span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">bl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">query</span><span class="p">(</span><span class="n">ct</span> <span class="o">%</span> <span class="n">n</span><span class="p">))</span> <span class="o">//</span> <span class="mi">16</span>
+        <span class="k">if</span> <span class="n">bl</span> <span class="o">==</span> <span class="n">blocklen</span><span class="p">:</span>
+            <span class="n">lb</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ub</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="k">return</span> <span class="n">blocklen</span><span class="o">*</span><span class="mi">128</span> <span class="o">-</span> <span class="n">lb</span> <span class="o">-</span> <span class="mi">8</span>
+
+
+<span class="n">flagbitlen</span> <span class="o">=</span> <span class="n">recover_bitlen</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="n">flagbytes</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">flagbitlen</span><span class="o">//</span><span class="mi">8</span>
+
+<span class="c1"># stage 1: recover first part of flag by finding k*flag = 2^2041
+# this takes quite a while, feel free to comment out
+</span><span class="n">flagmin</span><span class="p">,</span> <span class="n">flagmax</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">flagbitlen</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="o">**</span><span class="n">flagbitlen</span>
+<span class="n">lb</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">2041</span><span class="p">)</span><span class="o">//</span><span class="n">flagmax</span>
+<span class="n">ub</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">2041</span><span class="p">)</span><span class="o">//</span><span class="n">flagmin</span>
+
+<span class="k">while</span> <span class="n">ub</span> <span class="o">-</span> <span class="n">lb</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">((</span><span class="n">ub</span> <span class="o">-</span> <span class="n">lb</span><span class="p">).</span><span class="n">bit_length</span><span class="p">())</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="p">(</span><span class="n">lb</span> <span class="o">+</span> <span class="n">ub</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span>
+    <span class="n">bitlen</span> <span class="o">=</span> <span class="n">recover_bitlen</span><span class="p">(</span><span class="n">ct</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bitlen</span> <span class="o">==</span> <span class="mi">2041</span><span class="p">:</span> <span class="c1"># k * flag &gt; 2^2041, therefore we need to reduce the upper bound
+</span>        <span class="n">ub</span> <span class="o">=</span> <span class="n">k</span>
+    <span class="k">else</span><span class="p">:</span> <span class="c1"># k * flag &lt; 2^2941, therefore we need to increase the lower bound
+</span>        <span class="n">lb</span> <span class="o">=</span> <span class="n">k</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"flag part 1: "</span><span class="p">,</span> <span class="n">long_to_bytes</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">2041</span> <span class="o">//</span> <span class="n">lb</span><span class="p">))</span>
+
+<span class="c1"># generates minimum and maximum values for flag
+</span><span class="k">def</span> <span class="nf">genminmax</span><span class="p">(</span><span class="n">flag</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">flag</span> <span class="o">+</span> <span class="p">(</span><span class="sa">b</span><span class="s">"</span><span class="se">\x20</span><span class="s">"</span> <span class="o">*</span> <span class="p">(</span><span class="n">flagbytes</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">flag</span><span class="p">)))),</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">flag</span> <span class="o">+</span> <span class="p">(</span><span class="sa">b</span><span class="s">"</span><span class="se">\x7f</span><span class="s">"</span> <span class="o">*</span> <span class="p">(</span><span class="n">flagbytes</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">flag</span><span class="p">))))</span>
+
+<span class="c1"># sets iv before each query
+</span><span class="k">def</span> <span class="nf">set_iv</span><span class="p">():</span> 
+    <span class="n">b</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># this is just a "fake" block so that we can recover the iv used for next round
+</span>    <span class="n">iv</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="o">-</span><span class="mi">16</span><span class="p">:]</span> <span class="c1"># we need to xor our chosen block with this because of CBC
+</span>    <span class="n">newblock</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="n">bxor</span><span class="p">(</span><span class="sa">b</span><span class="s">"a"</span> <span class="o">*</span> <span class="mi">16</span><span class="p">,</span> <span class="n">iv</span><span class="p">))</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">newblock</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">query</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span> <span class="c1"># the iv is now fixed
+</span>    
+<span class="c1"># attempts to recover the flag part that is actually correct, there are probably better ways to do this (including manually), but this will do
+</span><span class="k">def</span> <span class="nf">determine_flag</span><span class="p">(</span><span class="n">flags</span><span class="p">):</span>
+    <span class="n">charset</span> <span class="o">=</span> <span class="n">string</span><span class="p">.</span><span class="n">printable</span><span class="p">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+    <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">f</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tflag</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">y</span> <span class="ow">and</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">charset</span><span class="p">:</span>
+            <span class="n">tflag</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">x</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">tflag</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># take off a couple for accuracy
+</span>
+<span class="n">flag</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"actf{the_letters_in_rsa_and_aes_for"</span>
+
+<span class="k">def</span> <span class="nf">query2</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+    <span class="n">set_iv</span><span class="p">()</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">c</span>
+    <span class="k">return</span> <span class="n">query</span><span class="p">(</span><span class="n">ct</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># stage 2: recover full flag by finding k*flag = a*n for increasing a
+# where a is chosen based on how much flag is known
+# this takes even longer, a needs to reach about 2^1500 to recover the whole flag
+</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">set_iv</span><span class="p">()</span>
+<span class="n">encn</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)[:</span><span class="mi">16</span><span class="p">]</span>
+
+<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span> <span class="o">!=</span> <span class="n">flagbytes</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">"a: 2^</span><span class="si">{</span><span class="n">a</span><span class="p">.</span><span class="n">bit_length</span><span class="p">()</span><span class="si">}</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">minflag</span><span class="p">,</span> <span class="n">maxflag</span> <span class="o">=</span> <span class="n">genminmax</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+    <span class="n">an</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="n">lowerbound</span><span class="p">,</span> <span class="n">upperbound</span> <span class="o">=</span> <span class="n">an</span><span class="o">//</span><span class="n">maxflag</span><span class="p">,</span> <span class="n">an</span><span class="o">//</span><span class="n">minflag</span>
+    <span class="k">assert</span> <span class="n">query2</span><span class="p">(</span><span class="n">lowerbound</span><span class="p">)[:</span><span class="mi">16</span><span class="p">]</span> <span class="o">==</span> <span class="n">encn</span> <span class="c1"># makes sure lowerbound * flag is close to a*n by checking first 128 bits
+</span>    <span class="k">assert</span> <span class="n">query2</span><span class="p">(</span><span class="n">upperbound</span><span class="p">)[:</span><span class="mi">16</span><span class="p">]</span> <span class="o">!=</span> <span class="n">encn</span> <span class="c1"># makes sure upperbound * flag &gt; a*n, so that there is a difference between these bounds
+</span>    <span class="n">power</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="n">floor</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="n">upperbound</span><span class="o">-</span><span class="n">lowerbound</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">flags</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># binary search
+</span>    <span class="k">while</span> <span class="n">power</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">power</span><span class="p">.</span><span class="n">bit_length</span><span class="p">())</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span> <span class="c1"># not quite binary search but close enough, just for reliability
+</span>            <span class="n">cip</span> <span class="o">=</span> <span class="n">query2</span><span class="p">(</span><span class="n">lowerbound</span> <span class="o">+</span> <span class="n">base</span> <span class="o">+</span> <span class="n">power</span><span class="o">*</span><span class="n">i</span><span class="p">)[:</span><span class="mi">16</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">cip</span> <span class="o">!=</span> <span class="n">encn</span><span class="p">:</span> <span class="c1"># k*flag &gt; a*n
+</span>                <span class="n">base</span> <span class="o">+=</span> <span class="n">power</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">power</span> <span class="o">//=</span> <span class="mi">2</span>
+                <span class="n">changed</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">break</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">long_to_bytes</span><span class="p">((</span><span class="n">a</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span><span class="o">//</span><span class="p">(</span><span class="n">lowerbound</span> <span class="o">+</span> <span class="n">base</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">:</span>
+            <span class="n">flags</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">changed</span><span class="p">:</span> <span class="c1"># this is kinda messy and honestly its easier to do this manually
+</span>            <span class="c1"># but for the sake of having a full solve script, we need to ensure 
+</span>            <span class="n">a</span> <span class="o">//=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">25</span> <span class="c1"># just to even it out a bit
+</span>            <span class="k">break</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="n">determine_flag</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">*=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">50</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>and after an hour or so of running this (with a few manual reruns due to timeouts), we get the flag.</p>
+
+<p>Flag:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>actf{the_letters_in_rsa_and_aes_form_aries_if_you_throw_in_the_letter_i_because_that_represents_yourself_or_something_anyway_aries_is_a_zodiac_sign_which_means_that_the_two_cryptosystems_are_mutually_compatble_i_think??}
+</code></pre></div></div>
+
+
+
+</article>
+
+
+
+<div class="post-pagination">
+  
+    <span class="post-pagination-item newer"></span>
+  
+
+  
+    <a class="post-pagination-item older" href="/posts/2022-04-13-hackpack-ctf">
+      <span class="post-pagination-title">HackPack CTF 2022
+</span> <i class="fas fa-chevron-right"></i>
+    </a>
+  
+</div>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>
