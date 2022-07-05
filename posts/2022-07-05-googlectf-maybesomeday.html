@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/normalize.css">
+  <link rel="stylesheet" href="/assets/css/ockham.css">
+  <script async src="/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> GoogleCTF 2022 - maybe someday | willwam845 </title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PPZXWFFSPB');
+</script>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/about/" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+      <li">
+        <a href="/projects/" class="sidebar-nav-item ">
+          projects
+        </a>
+      </li>
+    
+      <li">
+        <a href="/archive/" class="sidebar-nav-item ">
+          archive
+        </a>
+      </li>
+    
+      <li">
+        <a href="/tags/" class="sidebar-nav-item ">
+          tags
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">GoogleCTF 2022 - maybe someday</h1>
+  <div class="post-meta">
+    <time datetime="2022-07-05T00:00:00+01:00" itemprop="datePublished">
+      05 Jul 2022
+    </time></div>
+
+  <p>I played GoogleCTF 2022 with DiceGang, and we got 2nd place!</p>
+
+<p><img src="/assets/postassets/07-05-2022-Google/scoreboard.PNG" alt="scoreboard" /></p>
+
+<p>This challenge created by <a href="https://mystiz.hk">mystiz</a> was pretty interesting, so I wrote it up.</p>
+
+<h1 id="maybe-someday">maybe someday</h1>
+
+<blockquote>
+  <p>Leave me your ciphertexts. I will talk to you later.</p>
+
+  <p><code class="language-plaintext highlighter-rouge">maybe-someday.2022.ctfcompetition.com 1337</code></p>
+</blockquote>
+
+<p><a href="#challenge-overview">skip code</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/python3
+</span>
+<span class="c1"># Copyright 2022 Google LLC
+#
+# Licensed under the c Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+</span>
+<span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">getPrime</span> <span class="k">as</span> <span class="n">get_prime</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+
+<span class="c1"># Suppose gcd(p, q) = 1. Find x such that
+#   1. 0 &lt;= x &lt; p * q, and
+#   2. x = a (mod p), and
+#   3. x = b (mod q).
+</span><span class="k">def</span> <span class="nf">crt</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="nb">pow</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span><span class="o">*</span><span class="n">q</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="nb">pow</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">p</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">n</span>
+
+<span class="k">class</span> <span class="nc">Paillier</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">get_prime</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">get_prime</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+        <span class="n">λ</span> <span class="o">=</span> <span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">math</span><span class="p">.</span><span class="n">gcd</span><span class="p">(</span><span class="n">p</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># lcm(p-1, q-1)
+</span>        <span class="n">g</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">µ</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">L</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">λ</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">n</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="p">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">λ</span> <span class="o">=</span> <span class="n">λ</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">µ</span> <span class="o">=</span> <span class="n">µ</span>
+
+        <span class="bp">self</span><span class="p">.</span><span class="n">p</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">q</span>
+
+    <span class="c1"># https://www.rfc-editor.org/rfc/rfc3447#section-7.2.1
+</span>    <span class="k">def</span> <span class="nf">pad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="n">padding_size</span> <span class="o">=</span> <span class="mi">2048</span><span class="o">//</span><span class="mi">8</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">padding_size</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">'message too long'</span><span class="p">)</span>
+
+        <span class="n">random_padding</span> <span class="o">=</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span> <span class="o">*</span> <span class="n">padding_size</span>
+        <span class="k">while</span> <span class="sa">b</span><span class="s">'</span><span class="se">\0</span><span class="s">'</span> <span class="ow">in</span> <span class="n">random_padding</span><span class="p">:</span>
+            <span class="n">random_padding</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="n">padding_size</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00\x02</span><span class="s">'</span> <span class="o">+</span> <span class="n">random_padding</span> <span class="o">+</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span> <span class="o">+</span> <span class="n">m</span>
+
+    <span class="k">def</span> <span class="nf">unpad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00\x02</span><span class="s">'</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">'decryption error'</span><span class="p">)</span>
+
+        <span class="n">random_padding</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="mi">2</span><span class="p">:].</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">random_padding</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">'decryption error'</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">m</span>
+
+    <span class="k">def</span> <span class="nf">public_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">g</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">secret_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">λ</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">µ</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">g</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">n</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">pad</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span>
+
+        <span class="n">r</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span>
+
+        <span class="k">return</span> <span class="n">c</span>
+
+    <span class="k">def</span> <span class="nf">decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="n">λ</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">λ</span>
+        <span class="n">µ</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">µ</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">n</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">λ</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">µ</span> <span class="o">%</span> <span class="n">n</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2048</span><span class="o">//</span><span class="mi">8</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">unpad</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fast_decrypt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+        <span class="n">λ</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">λ</span>
+        <span class="n">µ</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">µ</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">n</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">p</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">q</span>
+
+        <span class="n">rp</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">λ</span><span class="p">,</span> <span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">rq</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">λ</span><span class="p">,</span> <span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">crt</span><span class="p">(</span><span class="n">rp</span><span class="p">,</span> <span class="n">rq</span><span class="p">,</span> <span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">L</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">µ</span> <span class="o">%</span> <span class="n">n</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">2048</span><span class="o">//</span><span class="mi">8</span><span class="p">,</span> <span class="s">'big'</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="p">.</span><span class="n">unpad</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">challenge</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="n">secret</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">secret</span> <span class="o">=</span> <span class="n">hashlib</span><span class="p">.</span><span class="n">sha512</span><span class="p">(</span><span class="n">secret</span><span class="p">).</span><span class="n">hexdigest</span><span class="p">().</span><span class="n">encode</span><span class="p">()</span>
+
+    <span class="n">c0</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">secret</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">c0</span> <span class="o">=</span> <span class="si">}</span><span class="s">'</span><span class="p">)</span>
+
+    <span class="c1"># # The secret has 16 bits of entropy.
+</span>    <span class="c1"># # Hence 16 oracle calls should be sufficient, isn't it?
+</span>    <span class="c1"># for _ in range(16):
+</span>    <span class="c1">#     c = int(input())
+</span>    <span class="c1">#     try:
+</span>    <span class="c1">#         p.decrypt(c)
+</span>    <span class="c1">#         print('😀')
+</span>    <span class="c1">#     except:
+</span>    <span class="c1">#         print('😡')
+</span>
+    <span class="c1"># I decided to make it non-interactive to make this harder.
+</span>    <span class="c1"># Good news: I'll give you 25% more oracle calls to compensate, anyways.
+</span>    <span class="n">cs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">())</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cs</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">.</span><span class="n">fast_decrypt</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'😀'</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'😡'</span><span class="p">)</span>
+
+    <span class="n">guess</span> <span class="o">=</span> <span class="nb">input</span><span class="p">().</span><span class="n">encode</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">guess</span> <span class="o">!=</span> <span class="n">secret</span><span class="p">:</span> <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">'incorrect guess!'</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'/flag.txt'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+      <span class="n">flag</span> <span class="o">=</span> <span class="n">f</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Paillier</span><span class="p">()</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">g</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="n">public_key</span><span class="p">()</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">n</span> <span class="o">=</span> <span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'</span><span class="si">{</span><span class="n">g</span> <span class="o">=</span> <span class="si">}</span><span class="s">'</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Once is happenstance. Twice is coincidence...
+</span>        <span class="c1"># Sixteen times is a recovery of the pseudorandom number generator.
+</span>        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">16</span><span class="p">):</span>
+            <span class="n">challenge</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'💡'</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="sa">f</span><span class="s">'🏁 </span><span class="si">{</span><span class="n">flag</span><span class="si">}</span><span class="s">'</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'👋'</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h3 id="challenge-overview">challenge overview</h3>
+
+<p>We are given access to a server which encrypts a hashed 2 byte secret using the Paillier cryptosystem. We are asked to submit 20 ciphertexts, and then it will decrypt them all at once.</p>
+
+<p>For each ciphertext, it will tell us whether it has valid padding (standard PKCS V1.5) or not.</p>
+
+<p>We are then asked for the hashed secret, and if it is correct, we can continue. If we can repeat this 16 times in a row, we get the flag.</p>
+
+<h2 id="solution">solution</h2>
+
+<p>Since we are dealing with a padding oracle type challenge, we should focus on the padding checking function itself.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">unpad</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="sa">b</span><span class="s">'</span><span class="se">\x00\x02</span><span class="s">'</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">'decryption error'</span><span class="p">)</span>
+
+        <span class="n">random_padding</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="mi">2</span><span class="p">:].</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s">'</span><span class="se">\x00</span><span class="s">'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">random_padding</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">'decryption error'</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">m</span>
+</code></pre></div></div>
+
+<p>The method used to check padding is that it splits the message into two parts by splitting at the first null byte, and then checking if the length of the first part (the random part) is greater than 8 bytes. It also checks if the first two bytes are <code class="language-plaintext highlighter-rouge">\x00\x02</code>. Therefore, there are three ways to cause the padding to be invalid:</p>
+
+<ul>
+  <li>corrupt the two bytes at the start of the plaintext</li>
+  <li>place the null byte at the start of the plaintext such that the random padding is less than 8 bytes</li>
+  <li>have no null byte in the plaintext at all, which means splitting <code class="language-plaintext highlighter-rouge">m</code> by a null byte will result in only one value, which will cause an error as the code expects two.</li>
+</ul>
+
+<p>We’ll mainly focus on <del>ab</del>using this last method.</p>
+
+<h3 id="paillier-cryptosystem">paillier cryptosystem</h3>
+
+<p>Understanding the fine details of <a href="https://en.wikipedia.org/wiki/Paillier_cryptosystem#Algorithm">the Paillier cryptosystem</a> used is not required for this challenge, although one very important thing we need to know is that Paillier has the property of homomorphic addition, that is, if we denote Paillier encryption as $P(x)$, then:</p>
+
+\[P(a) * P(b) = P(a + b)\]
+
+<p>We can show this by looking at Paillier in little more detail, specifically at the encryption of a message.</p>
+
+<p>A keypair is generated by generating two primes $p, q$, and then computing $n = p * q$, and then a $g \in (0, n-1)$ is also chosen. The public key is the pair $(n, g)$. I won’t cover how the private key/decryption works here, since it is not very relevant for the challenge. All we need to know is that it works :)</p>
+
+<p>To encrypt a message $m$, a random $r \in (0, n-1)$ is chosen, and then the ciphertext $c$ is equal to:</p>
+
+\[c \equiv g^{m} * r^n \bmod n^2\]
+
+<p>The $r$ value when encrypting messages does not affect what it decrypts to, it only changes the ciphertext itself.</p>
+
+<p>Now, we can show the property above by multiplying the ciphertexts of two messages $m_1, m_2$. We also denote the $r$ values chosen for the encryption as $r_1, r_2$</p>
+
+\[\begin{eqnarray}
+c_1 &amp;=&amp; g^{m_1}r^{n}\\
+c_2 &amp;=&amp; g^{m_2}r^{n}\\
+c_1c_2 &amp;=&amp; g^{m_1}g^{m2} * r_1^{n}r_2^{n} \bmod n^{2}\\
+\end{eqnarray}\]
+
+<p>Notice that $g^{m_1} * g^{m_2}$ turns into $g^{(m1 + m2)}$, and notice that $r_1 ^ {n} * r_2^{n}$ turns into $(r_1r_2)^{n}$. Since the $r$ values are random, a product of $r$ values will just result in another “possible” $r$ value (which we’ll denote $r_3$).</p>
+
+<p>Therefore, we have:</p>
+
+\[c_1c_2 = g^{(m1 + m2)} r_3^{n} \bmod n^{2}\]
+
+<p>which is an encryption of $m_1 + m_2$.</p>
+
+<p>As we established above, the $r$ value does not affect decryption, so it does not matter if the $r$ values are different, it will still decrypt to $m_1 + m_2$.</p>
+
+<h3 id="leaking-information">leaking information</h3>
+
+<p>Using this homomorphic addition property, we are able to arbitrarily add values to our plaintext (which includes negative values, therefore allowing for subtraction too).</p>
+
+<p>However, since we have to submit all 20 ciphertexts at once, we cannot use any sort of adaptive ciphertext attacks, where we modify the ciphertext based on the result of the query (such as binary search).</p>
+
+<p>The trick to this challenge is that since we can arbitrarily subtract any value from the plaintext, we can use this to guess a value for a byte at a certain position, by subtracting a value such that it will turn into a null byte.</p>
+
+<p>Since there is already a null byte in the padding, we must first add some random value such that this null byte disappears.</p>
+
+<p>Then, a null byte will be present in the plaintext if our guess for the byte at that position is correct. Since the null byte is what causes the padding to be valid, the padding will only be valid if our guess is correct.</p>
+
+<p><img src="/assets/postassets/07-05-2022-Google/img1.PNG" alt="correct guess" /></p>
+
+<p>Otherwise, if our guess is wrong, there will be no null byte in the plaintext, and it will error (as mentioned above).</p>
+
+<p><img src="/assets/postassets/07-05-2022-Google/img2.PNG" alt="incorrect guess" /></p>
+
+<p>We can also extend this to testing for multiple bytes, although we will only know if at least one of our guesses is correct, and we won’t know which one that is.</p>
+
+<p><img src="/assets/postassets/07-05-2022-Google/img3.PNG" alt="guessing multiple bytes" /></p>
+
+<p>So, this allows us to, on each query, divide the possible plaintexts into two sets, one where the padding would be valid, and one where the padding would not be valid (the random bytes are not affected, and so do not matter). If we send 20 different queries, and find the intersection of the 20 resulting sets, we should hope to find only the correct plaintext.</p>
+
+<p><em>Theoretically</em> we only need 16, as there are 16 bits of entropy, however the author was very nice and gave us 4 extra, so we can use a very naive method to generate them, which is essentially just randomly generating queries that split the set of candidates in half.</p>
+
+<h3 id="implementation-details">implementation details</h3>
+
+<p>To generate the queries, I used a greedy-type algorithm to pick the most common character (that wouldn’t cause the subset to contain above half) at a randomly chosen index, adding all candidates which had that character at the index, and repeating until the resulting subset was about half of the total number of candidates. Additionally, since the possible candidates remain the same for all rounds, we can use the same queries each time.</p>
+
+<p>One thing we need to be quite careful about when generating the queries is that we <strong>cannot test consecutive bytes in the same query</strong>.</p>
+
+<p>To see why this is an issue (and you might have spotted it in the diagram above), suppose we make a guess for the second byte that is too high. The subtraction will cause the first byte to decrease by one, so even if we guess the first byte correctly, the null byte will not appear, and the padding will be marked as invalid, meaning we’ll get an invalid result, even though our guess for the first byte is correct, and we would expect this to result in a successful decryption 😡.</p>
+
+<p><img src="/assets/postassets/07-05-2022-Google/img4.PNG" alt="weird behavior" /></p>
+
+<p>Of course, this is quite easy to fix, we just make sure that when we randomly pick an index, we ensure it isn’t adjacent to an index we have already chosen before. <sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup></p>
+
+<p>To test for the probability of success on a given round, all we need to do is work out the number of unique responses the server can give for the given queries, and then divide this by the total number of candidates. I found for a given round, the success rate was around $95.5\%$. Then, to calculate the probability of success on all rounds, we just raise this to the power of the number of rounds, 16. This gives us a success rate of about $47.8\%$, so we should only need to run the script once or twice to get the flag.</p>
+
+<p>Solve script (with a few added comments) below.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pwn</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="nb">reduce</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="n">s</span> <span class="o">=</span> <span class="n">remote</span><span class="p">(</span><span class="s">"maybe-someday.2022.ctfcompetition.com"</span><span class="p">,</span> <span class="mi">1337</span><span class="p">)</span>
+
+<span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"n = "</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+<span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"g = "</span><span class="p">)</span>
+<span class="n">g</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+
+<span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">hashlib</span><span class="p">.</span><span class="n">sha512</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">secret</span><span class="p">)).</span><span class="n">hexdigest</span><span class="p">().</span><span class="n">encode</span><span class="p">()</span> <span class="k">for</span> <span class="n">secret</span> <span class="ow">in</span> <span class="n">itertools</span><span class="p">.</span><span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span> <span class="n">repeat</span><span class="o">=</span><span class="mi">2</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">query</span><span class="p">(</span><span class="n">cts</span><span class="p">):</span>
+    <span class="p">[</span><span class="n">s</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cts</span><span class="p">]</span>
+    <span class="n">resp</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">().</span><span class="n">decode</span><span class="p">().</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">"😀"</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)]</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">resp</span>
+
+<span class="k">def</span> <span class="nf">generate_query</span><span class="p">():</span>
+    <span class="n">subset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">indexes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">querying</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">unused</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[:]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">32768</span><span class="p">:</span> <span class="c1"># ideally 50% in each set
+</span>        <span class="n">index</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span> <span class="c1"># just pick random indexes, leave the first one untouched for underflow
+</span>        <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">index</span> <span class="o">+</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">indexes</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]):</span> <span class="c1"># check no adjacent bytes
+</span>            <span class="n">c</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">cand</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">cand</span> <span class="ow">in</span> <span class="n">unused</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="n">freq</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">most_common</span><span class="p">()):</span> <span class="c1"># greedy-type algorithm
+</span>                <span class="k">if</span> <span class="n">freq</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">32768</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">subset</span><span class="p">)):</span>
+                    <span class="n">indexes</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">querying</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">char</span><span class="p">))</span>
+                    <span class="p">[</span><span class="n">subset</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">cand</span><span class="p">)</span> <span class="k">for</span> <span class="n">cand</span> <span class="ow">in</span> <span class="n">unused</span> <span class="k">if</span> <span class="n">cand</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="n">char</span><span class="p">]</span>
+                    <span class="k">break</span>
+
+                <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span>
+                    <span class="n">indexes</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">querying</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">char</span><span class="p">))</span>
+                    <span class="p">[</span><span class="n">subset</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">cand</span><span class="p">)</span> <span class="k">for</span> <span class="n">cand</span> <span class="ow">in</span> <span class="n">unused</span> <span class="k">if</span> <span class="n">cand</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="n">char</span><span class="p">]</span>
+
+        <span class="n">unused</span> <span class="o">=</span> <span class="p">[</span><span class="n">u</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">unused</span> <span class="k">if</span> <span class="n">u</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subset</span><span class="p">]</span>
+    <span class="n">fset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">unused</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">querying</span><span class="p">,</span> <span class="n">fset</span><span class="p">,</span> <span class="n">subset</span> <span class="c1"># query itself, set when invalid padding, set when valid padding
+</span>
+<span class="k">def</span> <span class="nf">generate_queries</span><span class="p">():</span>
+    <span class="n">datas</span> <span class="o">=</span> <span class="p">[</span><span class="n">generate_query</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)]</span>
+    <span class="n">queries</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="n">qsets</span> <span class="o">=</span> <span class="p">[[</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">queries</span><span class="p">,</span> <span class="n">qsets</span>
+
+<span class="k">def</span> <span class="nf">pallier_encrypt</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+    <span class="c1"># raw pallier encryption without padding
+</span>    <span class="n">r</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">c</span>
+
+<span class="k">def</span> <span class="nf">calculate_ct</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+    <span class="n">querypt</span> <span class="o">=</span> <span class="p">(</span><span class="mh">0xff</span> <span class="o">&lt;&lt;</span> <span class="mi">128</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">x</span> <span class="o">*</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="mi">8</span> <span class="o">*</span> <span class="p">(</span><span class="mi">127</span> <span class="o">-</span> <span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">query</span><span class="p">])</span> 
+    <span class="c1"># first part is to get rid of the null byte part of the normal padding
+</span>    <span class="c1"># second part is our query
+</span>    <span class="n">new_ct</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="n">pallier_encrypt</span><span class="p">(</span><span class="n">querypt</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">new_ct</span> <span class="o">%</span> <span class="n">n</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">check_queries</span><span class="p">(</span><span class="n">queries</span><span class="p">):</span>
+    <span class="c1"># checks how many unique responses we can get, out of the possible len(candidates)
+</span>    <span class="n">resps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">cand</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">candidates</span><span class="p">):</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">2</span><span class="o">**</span><span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="n">cand</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">==</span> <span class="n">char</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">query</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">query</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">queries</span><span class="p">)])</span>
+        <span class="n">resps</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">resp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">resps</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span>
+
+<span class="n">find_intersection</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="p">:</span> <span class="n">a</span><span class="p">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">queries</span><span class="p">,</span> <span class="n">qsubsets</span> <span class="o">=</span> <span class="n">generate_queries</span><span class="p">()</span> <span class="c1"># we don't need to regenerate the queries each time
+</span><span class="n">prob</span> <span class="o">=</span> <span class="n">check_queries</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"probability of success for one round: "</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span> <span class="c1"># usually around 0.96
+</span><span class="k">print</span><span class="p">(</span><span class="s">"probability of success for all rounds: "</span><span class="p">,</span> <span class="n">prob</span><span class="o">**</span><span class="mi">16</span><span class="p">)</span> <span class="c1"># usually around 0.5
+</span>
+<span class="k">def</span> <span class="nf">solve_round</span><span class="p">():</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">recvuntil</span><span class="p">(</span><span class="s">"="</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">())</span>
+    <span class="n">roundqueries</span> <span class="o">=</span> <span class="p">[</span><span class="n">calculate_ct</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span> <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">]</span> <span class="c1"># but we need to recalculate what we send to the server
+</span>    <span class="n">resp</span> <span class="o">=</span> <span class="n">query</span><span class="p">(</span><span class="n">roundqueries</span><span class="p">)</span>
+    <span class="n">subsets</span> <span class="o">=</span> <span class="p">[</span><span class="n">qsubsets</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">r</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">resp</span><span class="p">)]</span> <span class="c1"># selecting the subsets based on the response
+</span>    <span class="n">secret</span> <span class="o">=</span> <span class="nb">reduce</span><span class="p">(</span><span class="n">find_intersection</span><span class="p">,</span> <span class="n">subsets</span><span class="p">)</span> <span class="c1"># and we find their intersection
+</span>    <span class="k">print</span><span class="p">(</span><span class="s">"intersection length: "</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">secret</span><span class="p">))</span>
+    <span class="n">s</span><span class="p">.</span><span class="n">sendline</span><span class="p">(</span><span class="n">secret</span><span class="p">.</span><span class="n">pop</span><span class="p">())</span> <span class="c1"># hopefully this is of length 1 and therefore is the secret
+</span>
+<span class="k">for</span> <span class="n">roundnum</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">17</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"round "</span><span class="p">,</span> <span class="n">roundnum</span><span class="p">)</span>
+    <span class="n">solve_round</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">s</span><span class="p">.</span><span class="n">recvline</span><span class="p">().</span><span class="n">decode</span><span class="p">().</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s">"👋"</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"failed on round"</span><span class="p">,</span> <span class="n">roundnum</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"sice on round"</span><span class="p">,</span> <span class="n">roundnum</span><span class="p">)</span>
+
+<span class="n">s</span><span class="p">.</span><span class="n">interactive</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h4 id="flag-ctfp4dd1n9_or4cl3_w1th_h0mom0rph1c_pr0p3r7y_c0m6in3d_in7o_a_w31rd_m47h_puzz1e">Flag: <code class="language-plaintext highlighter-rouge">CTF{p4dd1n9_or4cl3_w1th_h0mom0rph1c_pr0p3r7y_c0m6in3d_in7o_a_w31rd_m47h_puzz1e}</code></h4>
+
+<div class="footnotes" role="doc-endnotes">
+  <ol>
+    <li id="fn:1" role="doc-endnote">
+      <p>If you really wanted to, you could probably find a workaround, but you’d need to take the other queries into account, and I didn’t want to implement it, so avoiding the problem entirely seemed better. <a href="#fnref:1" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+
+</article>
+
+
+
+<div class="post-pagination">
+  
+    <span class="post-pagination-item newer"></span>
+  
+
+  
+    <a class="post-pagination-item older" href="/posts/2022-05-19-htb-cyberapocalypse-2022">
+      <span class="post-pagination-title">HTB CyberApocalypse CTF 2022
+</span> <i class="fas fa-chevron-right"></i>
+    </a>
+  
+</div>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>
