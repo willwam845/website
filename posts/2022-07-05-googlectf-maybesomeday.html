@@ -123,7 +123,7 @@
 
   <p>I played GoogleCTF 2022 with DiceGang, and we got 2nd place!</p>
 
-<p><img src="/assets/postassets/07-05-2022-Google/scoreboard.PNG" alt="scoreboard" /></p>
+<p><img src="/assets/postassets/07-05-2022-Google/scoreboard.png" alt="scoreboard" /></p>
 
 <p>This challenge created by <a href="https://mystiz.hk">mystiz</a> was pretty interesting, so I wrote it up.</p>
 
@@ -388,15 +388,15 @@ c_1c_2 &amp;=&amp; g^{m_1}g^{m2} * r_1^{n}r_2^{n} \bmod n^{2}\\
 
 <p>Then, a null byte will be present in the plaintext if our guess for the byte at that position is correct. Since the null byte is what causes the padding to be valid, the padding will only be valid if our guess is correct.</p>
 
-<p><img src="/assets/postassets/07-05-2022-Google/img1.PNG" alt="correct guess" /></p>
+<p><img src="/assets/postassets/07-05-2022-Google/img1.png" alt="correct guess" /></p>
 
 <p>Otherwise, if our guess is wrong, there will be no null byte in the plaintext, and it will error (as mentioned above).</p>
 
-<p><img src="/assets/postassets/07-05-2022-Google/img2.PNG" alt="incorrect guess" /></p>
+<p><img src="/assets/postassets/07-05-2022-Google/img2.png" alt="incorrect guess" /></p>
 
 <p>We can also extend this to testing for multiple bytes, although we will only know if at least one of our guesses is correct, and we won’t know which one that is.</p>
 
-<p><img src="/assets/postassets/07-05-2022-Google/img3.PNG" alt="guessing multiple bytes" /></p>
+<p><img src="/assets/postassets/07-05-2022-Google/img3.png" alt="guessing multiple bytes" /></p>
 
 <p>So, this allows us to, on each query, divide the possible plaintexts into two sets, one where the padding would be valid, and one where the padding would not be valid (the random bytes are not affected, and so do not matter). If we send 20 different queries, and find the intersection of the 20 resulting sets, we should hope to find only the correct plaintext.</p>
 
@@ -410,7 +410,7 @@ c_1c_2 &amp;=&amp; g^{m_1}g^{m2} * r_1^{n}r_2^{n} \bmod n^{2}\\
 
 <p>To see why this is an issue (and you might have spotted it in the diagram above), suppose we make a guess for the second byte that is too high. The subtraction will cause the first byte to decrease by one, so even if we guess the first byte correctly, the null byte will not appear, and the padding will be marked as invalid, meaning we’ll get an invalid result, even though our guess for the first byte is correct, and we would expect this to result in a successful decryption 😡.</p>
 
-<p><img src="/assets/postassets/07-05-2022-Google/img4.PNG" alt="weird behavior" /></p>
+<p><img src="/assets/postassets/07-05-2022-Google/img4.png" alt="weird behavior" /></p>
 
 <p>Of course, this is quite easy to fix, we just make sure that when we randomly pick an index, we ensure it isn’t adjacent to an index we have already chosen before. <sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup></p>
 
