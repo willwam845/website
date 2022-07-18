@@ -414,7 +414,13 @@ c_1c_2 &amp;=&amp; g^{m_1}g^{m2} * r_1^{n}r_2^{n} \bmod n^{2}\\
 
 <p>Of course, this is quite easy to fix, we just make sure that when we randomly pick an index, we ensure it isn’t adjacent to an index we have already chosen before. <sup id="fnref:1" role="doc-noteref"><a href="#fn:1" class="footnote" rel="footnote">1</a></sup></p>
 
-<p>To test for the probability of success on a given round, all we need to do is work out the number of unique responses the server can give for the given queries, and then divide this by the total number of candidates. I found for a given round, the success rate was around $95.5\%$. Then, to calculate the probability of success on all rounds, we just raise this to the power of the number of rounds, 16. This gives us a success rate of about $47.8\%$, so we should only need to run the script once or twice to get the flag.</p>
+<p>To test the probability of success on a given round, we just need to divide the number of unique responses of the server by the total number of candidates.</p>
+
+<p>Why is this the case? Remember, we are trying to guess the candidate that gave the response received by the server.</p>
+
+<p>Suppose for a unique response, there are $k$ candidates out of the set of all candidates that produce the response. Then, the server has a $\frac{k}{n}$ chance of picking a candidate which produces this response, where $n$ is the number of possible candidates. We have a $\frac{1}{k}$ chance of guessing the correct candidate. Therefore, for all unique responses, there is a $\frac{k}{n} * \frac{1}{k} = \frac{1}{n}$ chance of success, regardless of $k$, and therefore the probability will just be the sum of these for all unique responses.</p>
+
+<p>For a given round, the success rate is about $95.5\%$, therefore the success rate for all 16 rounds will be $95.5^{16} \approx 47.9\%$, meaning we should only need to run this one or two times to get the flag.</p>
 
 <p>Solve script (with a few added comments) below.</p>
 
