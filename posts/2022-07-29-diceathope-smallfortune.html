@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/assets/css/normalize.css">
+  <link rel="stylesheet" href="/assets/css/ockham.css">
+  <script async src="/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> DiceCTF @ HOPE - small-fortune | willwam845 </title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-PPZXWFFSPB');
+</script>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/about/" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+      <li">
+        <a href="/projects/" class="sidebar-nav-item ">
+          projects
+        </a>
+      </li>
+    
+      <li">
+        <a href="/archive/" class="sidebar-nav-item ">
+          archive
+        </a>
+      </li>
+    
+      <li">
+        <a href="/tags/" class="sidebar-nav-item ">
+          tags
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">DiceCTF @ HOPE - small-fortune</h1>
+  <div class="post-meta">
+    <time datetime="2022-07-29T00:00:00+01:00" itemprop="datePublished">
+      29 Jul 2022
+    </time></div>
+
+  <p>This week, our team organized <a href="https://ctftime.org/event/1706">DiceCTF @ HOPE</a>, which was a CTF for the <a href="https://www.hope.net"><strong>HOPE 2022: A New Hope</strong></a> conference in New York. Special thanks to the organizers of the HOPE conference for giving us this opportunity, it was good fun to organize!</p>
+
+<p>I ended up writing one medium-ish crypto challenge: <code class="language-plaintext highlighter-rouge">small-fortune</code>, which ended up getting 20 solves, and was the least solved crypto challenge of the CTF. All challenge files can be found <a href="https://github.com/willwam845/ctf/tree/main/DiceCTF@HOPE2022/crypto-small-fortune">here</a></p>
+
+<p>I’ve also included a little section at the bottom which goes over my thought process when making this challenge.</p>
+
+<h1 id="challenge">challenge</h1>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">gmpy2</span> <span class="kn">import</span> <span class="n">legendre</span>
+
+<span class="n">flag</span> <span class="o">=</span> <span class="n">bytes_to_long</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">"flag.txt"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">).</span><span class="n">read</span><span class="p">())</span>
+
+<span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">256</span><span class="p">),</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">getRandomRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">legendre</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">or</span> <span class="n">legendre</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">getRandomRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">gm_encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">getRandomRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">enc</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="n">bit</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">&amp;</span> <span class="mi">1</span>
+        <span class="n">msg</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
+        <span class="n">enc</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bit</span><span class="p">))</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">+=</span> <span class="n">getRandomRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">48</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">enc</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"n ="</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"x ="</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"enc ="</span><span class="p">,</span> <span class="n">gm_encrypt</span><span class="p">(</span><span class="n">flag</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>The flag is encrypted bit by bit using the <a href="https://en.wikipedia.org/wiki/Goldwasser–Micali_cryptosystem"><strong>Goldwasser-Micali</strong></a> cryptosystem. Notably, the random $y_k$ values are related, with $y_{k+1} - y_{k} &lt; 2^{48}$ for all $k$.</p>
+
+<h1 id="solution">solution</h1>
+
+<p>Goldwasser-Micali is a cryptosystem based on the fact that determining whether some value $x$ is a quadratic residue $\bmod$ some composite number $n$, that is, if there exists some value $a$ where $x \equiv a^{2} \bmod n$, is hard without the factorization of $n$.</p>
+
+<p>To begin, we choose $n = pq$, where $p, q$ are large primes. Then, we choose some value $x$ such that it is <strong>not</strong> a quadratic residue $\bmod n$. The public key is the pair $(n, x)$, while the secret key is the factorization of $n$.</p>
+
+<p>To encrypt a bit $b$, we first generate some random value $y$. The resulting ciphertext $c$ is computed as:</p>
+
+\[x^{b} * y^{2} \equiv c \bmod n\]
+
+<p>If the bit is a 0, $x^{b} = 1$, therefore $c = y^{2}$, meaning that it is a quadratic residue $\bmod n$. If the bit is a 1, $c = xy^{2}$. Notice that since $x$ is not a quadratic residue $\bmod n$, $c$ is not a quadratic residue $\bmod n$ either.</p>
+
+<p>So, to encrypt a plaintext $P$, we need to divide it into bits $(b_0, b_1, \dots b_k)$, and then encrypt each bit individually to get a list of ciphertexts $(c_0, c_1, \dots c_k)$.</p>
+
+<p>To decrypt a ciphertext, we just need to determine whether each of the $c_k$’s is a quadratic residue $\bmod n$, which is easy knowing the factorization of $n$.</p>
+
+<p>The $y_k$’s used should be random each time, but in this case, they are not: we know that $y_{k+1} - y_k$ (denote this value as $d_k$) is less than $2^{48}$, which is very small compared to the 512 bit $n$. This hints that we can maybe use Coppersmith or lattice based attacks to solve this challenge.</p>
+
+<h2 id="finding-d_0">finding $d_0$</h2>
+
+<p>The main idea for this challenge is to obtain a polynomial with one of the $d_k$’s as it’s roots. Since this value is very small, we should hopefully be able to use Coppersmith to obtain it.</p>
+
+<p>First, we note that because of the flag format (<code class="language-plaintext highlighter-rouge">hope{}</code>), the last character is a <code class="language-plaintext highlighter-rouge">}</code>, and so $b_0 = 1, b_1 = 0$.</p>
+
+<p>Then, we write two polynomials:</p>
+
+\[\begin{eqnarray}
+f_1(m, n) &amp;=&amp; xm^{2} - c_0\\
+f_2(m, n) &amp;=&amp; (m + n)^{2} - c_1\\
+\end{eqnarray}\]
+
+<p>which both have $y, d_0$ as roots.</p>
+
+<p>Since they have common roots, we should be able to do some rearranging to get rid of $m$, so we are left with a univariate polynomial in $n$ with $d_0$ as its root. Doing this manually is probably too annoying, but we can use resultants to do this for us.</p>
+
+<p>Once we have our polynomial in $n$ with $d_0$ as the root, all we need to do is chuck <code class="language-plaintext highlighter-rouge">small_roots()</code> at it, and hopefully we can recover $d_0$.</p>
+
+<h2 id="finding-y_0">finding y_0</h2>
+
+<p>Now that we have $d_0$, we can rewrite the polynomials above replacing $n$ with $d_0$:</p>
+
+\[\begin{eqnarray}
+f_1(m) &amp;=&amp; xm^{2} - c_0\\
+f_2(m) &amp;=&amp; (m + d_0)^{2} - c_1\\
+\end{eqnarray}\]
+
+<p>Since both of these polynomials share a common root of $y_0$, they both have a factor of $(m - y_0)$. We can use polynomial-GCD to hopefully obtain this factor and retrieve $y_0$.</p>
+
+<h2 id="finding-the-rest-of-the-flag">finding the rest of the flag</h2>
+
+<p>The rest of the flag can be obtained by writing each subsequent $y_k$ as $y_0 + n_k$, where $n_k$ is some small value. Then, we can try finding small roots of the polynomial $f(n) = (y_0 + n)^{2} - c_k$, where if a small root exists, we know the bit is a 1, otherwise it is a 0. We could also check if small roots exist for $f(n) = x(y_0 + n)^{2} - c_k$, to double check the bit is a 0, but I decided not to.</p>
+
+<p>Solve script below.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="k">exec</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">'output.txt'</span><span class="p">).</span><span class="n">read</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">resultant</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">f1</span><span class="p">.</span><span class="n">sylvester_matrix</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span> <span class="n">var</span><span class="p">)).</span><span class="n">determinant</span><span class="p">()</span>
+
+<span class="n">pgcd</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">g1</span><span class="p">,</span> <span class="n">g2</span><span class="p">:</span> <span class="n">g1</span><span class="p">.</span><span class="n">monic</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">g2</span> <span class="k">else</span> <span class="n">pgcd</span><span class="p">(</span><span class="n">g2</span><span class="p">,</span> <span class="n">g1</span><span class="o">%</span><span class="n">g2</span><span class="p">)</span>
+
+<span class="n">P</span><span class="p">.</span><span class="o">&lt;</span><span class="n">y</span><span class="p">,</span> <span class="n">k</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">PolynomialRing</span><span class="p">(</span><span class="n">Zmod</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">p1</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">enc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">enc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">p3</span> <span class="o">=</span> <span class="n">resultant</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">p3</span><span class="p">.</span><span class="n">univariate_polynomial</span><span class="p">().</span><span class="n">monic</span><span class="p">().</span><span class="n">small_roots</span><span class="p">())</span>
+
+<span class="n">P</span><span class="p">.</span><span class="o">&lt;</span><span class="n">y</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">PolynomialRing</span><span class="p">(</span><span class="n">Zmod</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">p1</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">y</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">enc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="n">k</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">enc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">p4</span> <span class="o">=</span> <span class="n">pgcd</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">p4</span><span class="p">.</span><span class="n">coefficients</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">P</span><span class="p">.</span><span class="o">&lt;</span><span class="n">k</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">PolynomialRing</span><span class="p">(</span><span class="n">Zmod</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">enc</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="n">flag</span> <span class="o">&lt;&lt;=</span> <span class="mi">1</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span><span class="o">+</span><span class="n">k</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="n">c</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">poly</span><span class="p">.</span><span class="n">monic</span><span class="p">().</span><span class="n">small_roots</span><span class="p">()):</span>
+        <span class="n">flag</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">long_to_bytes</span><span class="p">(</span><span class="n">flag</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h4 id="flag-hoper4nd0m_sh0uld_b3_truly_r4nd0m_3v3ry_t1m3_sh0uld_1t_n0t">Flag: <code class="language-plaintext highlighter-rouge">hope{r4nd0m_sh0uld_b3_truly_r4nd0m_3v3ry_t1m3_sh0uld_1t_n0t?}</code></h4>
+
+<h1 id="challenge-creation">challenge creation</h1>
+
+<p>The final version of this challenge is mostly based on the Coppersmith Short-Pad attack, which is an attack used when the difference between two messages is small, due to short padding for example. The attack works similar to the challenge: rewrite the messages as $y, y + d$ and use resultants to eliminate $y$, leaving a polynomial with $d$ as a small root, which can be solved for with Coppersmith. The resulting $y$ can be determined using polynomial-GCD once $d$ is recovered.</p>
+
+<p>Originally, I did not mean for this to be based off the Coppersmith Short-Pad attack, but rather just a challenge that could be solved using polynomial GCD. I chose to do it like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">gm_encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">getRandomRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">enc</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="n">bit</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">&amp;</span> <span class="mi">1</span>
+        <span class="n">msg</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
+        <span class="n">enc</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bit</span><span class="p">))</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">enc</span>
+</code></pre></div></div>
+
+<p>Since $d$ is known, this can be solved using polynomial GCD. The issue is that the differences between $y_k^{2}$ values is very close, as:</p>
+
+\[(y + 1)^2 - y^{2} = 2y + 1\]
+
+<p>This means that we can just look at the differences between $c_k$ values and see which differences are very close together, in which case we know the two bits in question are both 0. If we find some differences which are very close, $y$ can be recovered, and then the rest of the flag is also easily recovered too.</p>
+
+<p>In fact, this works even when the added thing is unknown but remains constant, but again has this rather simple solution.</p>
+
+<p>Eventually, I decided to add a small, but bruteforceable value:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">gm_encrypt</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">getRandomRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">enc</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="n">msg</span><span class="p">:</span>
+        <span class="n">bit</span> <span class="o">=</span> <span class="n">msg</span> <span class="o">&amp;</span> <span class="mi">1</span>
+        <span class="n">msg</span> <span class="o">&gt;&gt;=</span> <span class="mi">1</span>
+        <span class="n">enc</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="nb">pow</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bit</span><span class="p">))</span> <span class="o">%</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">+=</span> <span class="n">getRandomRange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">**</span><span class="mi">16</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">enc</span>
+</code></pre></div></div>
+
+<p>which is basically the same as the current version, except instead of finding $d$ by resultants + Coppersmith, you can just bruteforce it and try polynomial GCD for all possible $d$.</p>
+
+<p>Finally, I realised that you don’t actually need to bruteforce $d$, and you can solve for it for Coppersmith. Since I felt this made it a more interesting challenge, I stuck with it, and I’m pretty pleased with how it turned out, as several people commented how they enjoyed the challenge and found it interesting.</p>
+
+<p>If you did enjoy this challenge (and you are reading this shortly after this post comes out), be sure to check out <a href="https://2022.cor.team">corCTF 2022</a>, where I’ll also be writing some (hopefully fun!) challenges.</p>
+
+<p>Of course, there was one thing I slightly messed up on, which was setting the modulus $n$ to be 512 bits, and it is theoretically possible to use <a href="https://github.com/eniac/faas">faas</a> for about $100… as shown below:</p>
+
+<h2 id="alternative-solution">alternative “solution”</h2>
+
+<p><img src="/assets/postassets/07-29-2022-Dice/unintended.png" alt="were you meant to factor it" />
+<small>credit to kalmarunion</small></p>
+
+<p>(no, you were not meant to factor it)</p>
+
+
+</article>
+
+
+
+<div class="post-pagination">
+  
+    <span class="post-pagination-item newer"></span>
+  
+
+  
+    <a class="post-pagination-item older" href="/posts/2022-07-05-googlectf-maybesomeday">
+      <span class="post-pagination-title">GoogleCTF 2022 - maybe someday
+</span> <i class="fas fa-chevron-right"></i>
+    </a>
+  
+</div>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>
