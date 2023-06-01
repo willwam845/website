@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/normalize.css">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/ockham.css">
+  <script async src="/supersecretweekly/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> Vigenere CBC | willwam845 </title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PPZXWFFSPB');
+</script>
+
+<script>
+  async function submitAnswer(){
+    answerBox = document.getElementById("answerbox")
+    submitBox = document.getElementById("submitbox")
+    answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
+    submitBox.innerHTML = "Submitting..."
+    for (i=0;i<25000;i++){
+      answer = await sha256(answer)
+    }
+    window.location = window.location.href + answer + ".html";
+  }
+
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);                    
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+</script>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/supersecretweekly/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/supersecretweekly/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/supersecretweekly/about" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/supersecretweekly/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">Vigenere CBC</h1>
+    <div class="form-group">
+      <input id="answerbox" class="form-control" type="text" name="answer" placeholder="Answer" required>
+    </div>
+    <div class="form-group">
+      <button id="submitbox" class="btn btn-primary" onclick="submitAnswer()">Check Answer</button>
+    </div>
+
+  <h4 id="cbc-is-better-than-ecb-mode-because-it-makes-things-more-secure-right"><i>CBC is better than ECB mode, because it makes things more secure, right?</i></h4>
+
+<p><a href="/puzzles/baby-vigenere-cbc/">intro puzzle</a></p>
+
+<h5 id="challenge-script">Challenge script:</h5>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="n">alphabet</span> <span class="o">=</span> <span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span>
+
+<span class="k">def</span> <span class="nf">generate_iv</span><span class="p">(</span><span class="n">block_size</span><span class="p">):</span>
+    <span class="c1"># generates a random string of `block_size` letters 
+</span>    <span class="c1"># to be used as the initialization vector for the encryption
+</span>    <span class="k">return</span> <span class="s">""</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">choices</span><span class="p">(</span><span class="n">alphabet</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">block_size</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">add_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">plaintext_block</span><span class="p">):</span>
+    <span class="n">key_idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">alphabet</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="n">key_char</span><span class="p">)</span> <span class="k">for</span> <span class="n">key_char</span> <span class="ow">in</span> <span class="n">key</span><span class="p">]</span>
+    <span class="n">pt_idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">alphabet</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="n">pt_char</span><span class="p">)</span> <span class="k">for</span> <span class="n">pt_char</span> <span class="ow">in</span> <span class="n">plaintext_block</span><span class="p">]</span>
+    <span class="c1"># adding the indexes of the key and plaintext together
+</span>    <span class="n">ct_idxs</span> <span class="o">=</span> <span class="p">[(</span><span class="n">key_idx</span> <span class="o">+</span> <span class="n">pt_idx</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">alphabet</span><span class="p">)</span> <span class="k">for</span> <span class="n">key_idx</span><span class="p">,</span> <span class="n">pt_idx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">key_idxs</span><span class="p">,</span> <span class="n">pt_idxs</span><span class="p">)]</span>
+    <span class="c1"># converting it back into an alphabetical string
+</span>    <span class="k">return</span> <span class="s">""</span><span class="p">.</span><span class="n">join</span><span class="p">([</span><span class="n">alphabet</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">ct_idxs</span><span class="p">])</span>
+
+<span class="k">def</span> <span class="nf">vigenere_block_chaining_encrypt</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">):</span>
+    <span class="n">key_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="c1"># pads the plaintext
+</span>    <span class="n">plaintext</span> <span class="o">=</span> <span class="n">pad</span><span class="p">(</span><span class="n">key_length</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">)</span>
+    <span class="c1"># generates an iv
+</span>    <span class="n">iv</span> <span class="o">=</span> <span class="n">generate_iv</span><span class="p">(</span><span class="n">key_length</span><span class="p">)</span>
+    <span class="c1"># splits the plaintext into blocks of length `key_length`
+</span>    <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">plaintext</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">key_length</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">plaintext</span><span class="p">),</span> <span class="n">key_length</span><span class="p">)]</span>
+    <span class="n">previous_block</span> <span class="o">=</span> <span class="n">iv</span>
+    <span class="n">ciphertext</span> <span class="o">=</span> <span class="s">""</span>
+    <span class="c1"># refer to https://www.educative.io/answers/what-is-cbc
+</span>    <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">blocks</span><span class="p">:</span>
+        <span class="c1"># adds the previous block
+</span>        <span class="c1"># for the first block this will be the random iv
+</span>        <span class="n">block</span> <span class="o">=</span> <span class="n">add_key</span><span class="p">(</span><span class="n">previous_block</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+        <span class="c1"># adds the vigenere key (the block cipher encryption)
+</span>        <span class="n">previous_block</span> <span class="o">=</span> <span class="n">add_key</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">block</span><span class="p">)</span>
+        <span class="c1"># adds the output to the final ciphertext
+</span>        <span class="n">ciphertext</span> <span class="o">+=</span> <span class="n">previous_block</span>
+    <span class="c1"># give back the plaintext with the iv
+</span>    <span class="k">return</span> <span class="n">iv</span><span class="p">,</span> <span class="n">ciphertext</span>
+    
+<span class="k">def</span> <span class="nf">pad</span><span class="p">(</span><span class="n">block_size</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">):</span>
+    <span class="c1"># pads the plaintext with X's until the length is a multiple of `block_size`
+</span>    <span class="n">plaintext</span> <span class="o">+=</span> <span class="s">"X"</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">plaintext</span><span class="p">)</span> <span class="o">%</span> <span class="n">block_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">plaintext</span>
+
+<span class="n">SECRET_MESSAGE</span> <span class="o">=</span> <span class="s">"THISISAFAKEMESSAGEYOUNEEDTOUSETHEOUTPUTTOGETTHEREALSECRETMESSAGE"</span>
+<span class="n">key</span> <span class="o">=</span> <span class="s">"AFAKEKEY"</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span>
+<span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">char</span> <span class="ow">in</span> <span class="n">alphabet</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">key</span><span class="p">])</span>
+<span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">char</span> <span class="ow">in</span> <span class="n">alphabet</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">SECRET_MESSAGE</span><span class="p">])</span>
+
+<span class="n">iv</span><span class="p">,</span> <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">vigenere_block_chaining_encrypt</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">SECRET_MESSAGE</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"iv ="</span><span class="p">,</span> <span class="n">iv</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"ciphertext ="</span><span class="p">,</span> <span class="n">ciphertext</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h5 id="output">Output:</h5>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>iv = XCVUSTKK
+ciphertext = WYZCAZIXERPEDAJTTMZRCHVVOIEWJXCFMCGHDHKDDMQWDKVRVCCAWNHOWDXHTUTCXPGLDXVQXEIESEITZUQIYHTTZJWKZVUTXKCHLWOCFWGVRQMPFILDXIULREEPMOWJFYGZJFYYFNMRCQWUEZQSOWYITZTWJVMWEACAQJKJLBMOWNSWSMRWCSFZDCOWIUZYNSDCUAXEYYFTRGFMTSVKZMHKSOTOULOGOLGMGRMOVGLTDDIOWBNILNADKNBQRMHXFMGUBLOWUNECFVALJGRYMLEHDMPYDQMRNDFZKCYBFGPMJUZFECEQKMAJYUOJVEBJMCHMSVOTNDXREBMIYNGEFCGPTIMWZVTHHQHANYEWVCJNYTCJKCNRCLEHROHKCORLATGHSKIE
+</code></pre></div></div>
+
+
+</article>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>

@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/normalize.css">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/ockham.css">
+  <script async src="/supersecretweekly/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> Electricode | willwam845 </title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PPZXWFFSPB');
+</script>
+
+<script>
+  async function submitAnswer(){
+    answerBox = document.getElementById("answerbox")
+    submitBox = document.getElementById("submitbox")
+    answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
+    submitBox.innerHTML = "Submitting..."
+    for (i=0;i<25000;i++){
+      answer = await sha256(answer)
+    }
+    window.location = window.location.href + answer + ".html";
+  }
+
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);                    
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+</script>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/supersecretweekly/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/supersecretweekly/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/supersecretweekly/about" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/supersecretweekly/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">Electricode</h1>
+    <div class="form-group">
+      <input id="answerbox" class="form-control" type="text" name="answer" placeholder="Answer" required>
+    </div>
+    <div class="form-group">
+      <button id="submitbox" class="btn btn-primary" onclick="submitAnswer()">Check Answer</button>
+    </div>
+
+  <h4 id="simplicity-is-very-elegant-but-is-it-secure"><i>Simplicity is very elegant, but is it secure?</i></h4>
+
+<p><a href="/puzzles/baby-electricode/">intro puzzle</a></p>
+
+<h5 id="challenge-script">Challenge script:</h5>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">AES</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">SECRET_MESSAGE</span> <span class="o">=</span> <span class="s">"THISISAFAKEMESSAGEYOUNEEDTOUSETHEOUTPUTTOGETTHEREALSECRETMESSAGE"</span>
+<span class="n">alphabet</span> <span class="o">=</span> <span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span>
+<span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">char</span> <span class="ow">in</span> <span class="n">alphabet</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">SECRET_MESSAGE</span><span class="p">])</span> <span class="c1"># makes sure the only characters in the secret message are in the alphabet
+</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">urandom</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span> <span class="c1"># generate a random key
+</span><span class="n">cipher</span> <span class="o">=</span> <span class="n">AES</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">AES</span><span class="p">.</span><span class="n">MODE_ECB</span><span class="p">)</span> <span class="c1"># defines the AES cipher using ECB mode
+</span><span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">SECRET_MESSAGE</span><span class="p">:</span> <span class="c1"># encrypt the secret message character by character
+</span>    <span class="k">print</span><span class="p">(</span><span class="n">cipher</span><span class="p">.</span><span class="n">encrypt</span><span class="p">((</span><span class="n">char</span> <span class="o">+</span> <span class="s">"</span><span class="se">\x00</span><span class="s">"</span> <span class="o">*</span> <span class="mi">15</span><span class="p">).</span><span class="n">encode</span><span class="p">()).</span><span class="nb">hex</span><span class="p">())</span> <span class="c1"># encrypt the character using AES-ECB mode
+</span></code></pre></div></div>
+
+<h5 id="output">Output:</h5>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>8e413fb567af43774a0548f33512345f
+fc6250cf6ffc56b0ec8ad964a9a69436
+35d1cf51d69e59eb7362ba1234632091
+f2ac545a54047af17df7a836c06da788
+fc6250cf6ffc56b0ec8ad964a9a69436
+b2537edc069d6a7cf459414bd9d68132
+fc6250cf6ffc56b0ec8ad964a9a69436
+abcef6667beaa72a79f2f2501cb5fdb4
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+b1d90d1a8830e296e733da7a737f89bd
+6367c23c6ef24d13771d4d913aa61ede
+75204bf7b031b7ed42afa3e6e0d09ac2
+97722671e472f38a7de77ba3adc8514d
+b2537edc069d6a7cf459414bd9d68132
+aa0b5e6d8ebd25852828322e0582e757
+61c4c070e25569723ec1237a58b2444c
+b2537edc069d6a7cf459414bd9d68132
+8e413fb567af43774a0548f33512345f
+084390594f9d8ede69731a920d38f669
+75204bf7b031b7ed42afa3e6e0d09ac2
+fcd4ff5c50b856e22c6382cfc7b24668
+aa0b5e6d8ebd25852828322e0582e757
+084390594f9d8ede69731a920d38f669
+75204bf7b031b7ed42afa3e6e0d09ac2
+aa0b5e6d8ebd25852828322e0582e757
+aa0b5e6d8ebd25852828322e0582e757
+a155270568e947ad38a58cd265340a67
+b2537edc069d6a7cf459414bd9d68132
+fc6250cf6ffc56b0ec8ad964a9a69436
+a249a9a5fa938d1ede64e155d4a84fa1
+35d1cf51d69e59eb7362ba1234632091
+97722671e472f38a7de77ba3adc8514d
+aa0b5e6d8ebd25852828322e0582e757
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+ddfe22f2283da4f48ef2fd804694e391
+f2ac545a54047af17df7a836c06da788
+35d1cf51d69e59eb7362ba1234632091
+084390594f9d8ede69731a920d38f669
+75204bf7b031b7ed42afa3e6e0d09ac2
+b2537edc069d6a7cf459414bd9d68132
+aa0b5e6d8ebd25852828322e0582e757
+61c4c070e25569723ec1237a58b2444c
+b2537edc069d6a7cf459414bd9d68132
+a76d4d61bf869a8ee2e5431ce64417b4
+aa0b5e6d8ebd25852828322e0582e757
+35d1cf51d69e59eb7362ba1234632091
+f2ac545a54047af17df7a836c06da788
+f2ac545a54047af17df7a836c06da788
+ac62d6e3cec72fa724c26d85e2de9012
+f2ac545a54047af17df7a836c06da788
+fc6250cf6ffc56b0ec8ad964a9a69436
+75204bf7b031b7ed42afa3e6e0d09ac2
+97b50503eb91515245ea9ad635f6d923
+8e413fb567af43774a0548f33512345f
+fc6250cf6ffc56b0ec8ad964a9a69436
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+35d1cf51d69e59eb7362ba1234632091
+b2537edc069d6a7cf459414bd9d68132
+ac62d6e3cec72fa724c26d85e2de9012
+fc6250cf6ffc56b0ec8ad964a9a69436
+6367c23c6ef24d13771d4d913aa61ede
+fcd4ff5c50b856e22c6382cfc7b24668
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+ddfe22f2283da4f48ef2fd804694e391
+aa0b5e6d8ebd25852828322e0582e757
+a76d4d61bf869a8ee2e5431ce64417b4
+abcef6667beaa72a79f2f2501cb5fdb4
+fc6250cf6ffc56b0ec8ad964a9a69436
+a76d4d61bf869a8ee2e5431ce64417b4
+a249a9a5fa938d1ede64e155d4a84fa1
+abcef6667beaa72a79f2f2501cb5fdb4
+a76d4d61bf869a8ee2e5431ce64417b4
+aa0b5e6d8ebd25852828322e0582e757
+db03fcdcf7a092e610f044156896ed2e
+6367c23c6ef24d13771d4d913aa61ede
+aa0b5e6d8ebd25852828322e0582e757
+75204bf7b031b7ed42afa3e6e0d09ac2
+fcd4ff5c50b856e22c6382cfc7b24668
+ac62d6e3cec72fa724c26d85e2de9012
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+35d1cf51d69e59eb7362ba1234632091
+f2ac545a54047af17df7a836c06da788
+ac62d6e3cec72fa724c26d85e2de9012
+8e413fb567af43774a0548f33512345f
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+fc6250cf6ffc56b0ec8ad964a9a69436
+75204bf7b031b7ed42afa3e6e0d09ac2
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+ac62d6e3cec72fa724c26d85e2de9012
+1681822340006c4aaac4a787d38632e7
+35d1cf51d69e59eb7362ba1234632091
+ac62d6e3cec72fa724c26d85e2de9012
+084390594f9d8ede69731a920d38f669
+b07c2f249237d7fbcbcdf92dbcf4971e
+fc6250cf6ffc56b0ec8ad964a9a69436
+ddfe22f2283da4f48ef2fd804694e391
+aa0b5e6d8ebd25852828322e0582e757
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+1681822340006c4aaac4a787d38632e7
+35d1cf51d69e59eb7362ba1234632091
+8e413fb567af43774a0548f33512345f
+75204bf7b031b7ed42afa3e6e0d09ac2
+b2537edc069d6a7cf459414bd9d68132
+b2537edc069d6a7cf459414bd9d68132
+fc6250cf6ffc56b0ec8ad964a9a69436
+fc6250cf6ffc56b0ec8ad964a9a69436
+b07c2f249237d7fbcbcdf92dbcf4971e
+35d1cf51d69e59eb7362ba1234632091
+a76d4d61bf869a8ee2e5431ce64417b4
+a155270568e947ad38a58cd265340a67
+aa0b5e6d8ebd25852828322e0582e757
+8e413fb567af43774a0548f33512345f
+ddfe22f2283da4f48ef2fd804694e391
+aa0b5e6d8ebd25852828322e0582e757
+fcd4ff5c50b856e22c6382cfc7b24668
+084390594f9d8ede69731a920d38f669
+35d1cf51d69e59eb7362ba1234632091
+f2ac545a54047af17df7a836c06da788
+f2ac545a54047af17df7a836c06da788
+ac62d6e3cec72fa724c26d85e2de9012
+084390594f9d8ede69731a920d38f669
+abcef6667beaa72a79f2f2501cb5fdb4
+ac62d6e3cec72fa724c26d85e2de9012
+fc6250cf6ffc56b0ec8ad964a9a69436
+6367c23c6ef24d13771d4d913aa61ede
+8e413fb567af43774a0548f33512345f
+fc6250cf6ffc56b0ec8ad964a9a69436
+f2ac545a54047af17df7a836c06da788
+695b918897337b345cef6e4d0549187b
+aa0b5e6d8ebd25852828322e0582e757
+a155270568e947ad38a58cd265340a67
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+aa0b5e6d8ebd25852828322e0582e757
+7ea90731233366e181a020e8cb86b9ce
+35d1cf51d69e59eb7362ba1234632091
+7ea90731233366e181a020e8cb86b9ce
+ac62d6e3cec72fa724c26d85e2de9012
+695b918897337b345cef6e4d0549187b
+35d1cf51d69e59eb7362ba1234632091
+a76d4d61bf869a8ee2e5431ce64417b4
+084390594f9d8ede69731a920d38f669
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+b2537edc069d6a7cf459414bd9d68132
+ddfe22f2283da4f48ef2fd804694e391
+a76d4d61bf869a8ee2e5431ce64417b4
+fc6250cf6ffc56b0ec8ad964a9a69436
+695b918897337b345cef6e4d0549187b
+084390594f9d8ede69731a920d38f669
+a155270568e947ad38a58cd265340a67
+aa0b5e6d8ebd25852828322e0582e757
+a155270568e947ad38a58cd265340a67
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+a155270568e947ad38a58cd265340a67
+ac62d6e3cec72fa724c26d85e2de9012
+aa0b5e6d8ebd25852828322e0582e757
+8e413fb567af43774a0548f33512345f
+ac62d6e3cec72fa724c26d85e2de9012
+fc6250cf6ffc56b0ec8ad964a9a69436
+6367c23c6ef24d13771d4d913aa61ede
+8e413fb567af43774a0548f33512345f
+b07c2f249237d7fbcbcdf92dbcf4971e
+fc6250cf6ffc56b0ec8ad964a9a69436
+6367c23c6ef24d13771d4d913aa61ede
+f2ac545a54047af17df7a836c06da788
+a155270568e947ad38a58cd265340a67
+ddfe22f2283da4f48ef2fd804694e391
+a76d4d61bf869a8ee2e5431ce64417b4
+fc6250cf6ffc56b0ec8ad964a9a69436
+7ea90731233366e181a020e8cb86b9ce
+35d1cf51d69e59eb7362ba1234632091
+7ea90731233366e181a020e8cb86b9ce
+f2ac545a54047af17df7a836c06da788
+ac62d6e3cec72fa724c26d85e2de9012
+75204bf7b031b7ed42afa3e6e0d09ac2
+fc6250cf6ffc56b0ec8ad964a9a69436
+b2537edc069d6a7cf459414bd9d68132
+6367c23c6ef24d13771d4d913aa61ede
+8e413fb567af43774a0548f33512345f
+aa0b5e6d8ebd25852828322e0582e757
+aa0b5e6d8ebd25852828322e0582e757
+fcd4ff5c50b856e22c6382cfc7b24668
+7ea90731233366e181a020e8cb86b9ce
+a249a9a5fa938d1ede64e155d4a84fa1
+fc6250cf6ffc56b0ec8ad964a9a69436
+a155270568e947ad38a58cd265340a67
+aa0b5e6d8ebd25852828322e0582e757
+1681822340006c4aaac4a787d38632e7
+b07c2f249237d7fbcbcdf92dbcf4971e
+aa0b5e6d8ebd25852828322e0582e757
+75204bf7b031b7ed42afa3e6e0d09ac2
+6367c23c6ef24d13771d4d913aa61ede
+8e413fb567af43774a0548f33512345f
+084390594f9d8ede69731a920d38f669
+75204bf7b031b7ed42afa3e6e0d09ac2
+97b50503eb91515245ea9ad635f6d923
+35d1cf51d69e59eb7362ba1234632091
+aa0b5e6d8ebd25852828322e0582e757
+8e413fb567af43774a0548f33512345f
+7ea90731233366e181a020e8cb86b9ce
+aa0b5e6d8ebd25852828322e0582e757
+fcd4ff5c50b856e22c6382cfc7b24668
+35d1cf51d69e59eb7362ba1234632091
+6367c23c6ef24d13771d4d913aa61ede
+8e413fb567af43774a0548f33512345f
+aa0b5e6d8ebd25852828322e0582e757
+084390594f9d8ede69731a920d38f669
+b2537edc069d6a7cf459414bd9d68132
+8e413fb567af43774a0548f33512345f
+6367c23c6ef24d13771d4d913aa61ede
+8e413fb567af43774a0548f33512345f
+6367c23c6ef24d13771d4d913aa61ede
+35d1cf51d69e59eb7362ba1234632091
+f2ac545a54047af17df7a836c06da788
+f2ac545a54047af17df7a836c06da788
+ac62d6e3cec72fa724c26d85e2de9012
+7ea90731233366e181a020e8cb86b9ce
+35d1cf51d69e59eb7362ba1234632091
+a155270568e947ad38a58cd265340a67
+8e413fb567af43774a0548f33512345f
+aa0b5e6d8ebd25852828322e0582e757
+35d1cf51d69e59eb7362ba1234632091
+a76d4d61bf869a8ee2e5431ce64417b4
+fcd4ff5c50b856e22c6382cfc7b24668
+b07c2f249237d7fbcbcdf92dbcf4971e
+6367c23c6ef24d13771d4d913aa61ede
+ddfe22f2283da4f48ef2fd804694e391
+aa0b5e6d8ebd25852828322e0582e757
+fcd4ff5c50b856e22c6382cfc7b24668
+7ea90731233366e181a020e8cb86b9ce
+ddfe22f2283da4f48ef2fd804694e391
+aa0b5e6d8ebd25852828322e0582e757
+75204bf7b031b7ed42afa3e6e0d09ac2
+97b50503eb91515245ea9ad635f6d923
+6367c23c6ef24d13771d4d913aa61ede
+084390594f9d8ede69731a920d38f669
+75204bf7b031b7ed42afa3e6e0d09ac2
+084390594f9d8ede69731a920d38f669
+abcef6667beaa72a79f2f2501cb5fdb4
+ac62d6e3cec72fa724c26d85e2de9012
+fc6250cf6ffc56b0ec8ad964a9a69436
+6367c23c6ef24d13771d4d913aa61ede
+1681822340006c4aaac4a787d38632e7
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+b2537edc069d6a7cf459414bd9d68132
+b2537edc069d6a7cf459414bd9d68132
+fc6250cf6ffc56b0ec8ad964a9a69436
+8e413fb567af43774a0548f33512345f
+aa0b5e6d8ebd25852828322e0582e757
+aa0b5e6d8ebd25852828322e0582e757
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+aa0b5e6d8ebd25852828322e0582e757
+61c4c070e25569723ec1237a58b2444c
+35d1cf51d69e59eb7362ba1234632091
+a249a9a5fa938d1ede64e155d4a84fa1
+ddfe22f2283da4f48ef2fd804694e391
+f2ac545a54047af17df7a836c06da788
+aa0b5e6d8ebd25852828322e0582e757
+fc6250cf6ffc56b0ec8ad964a9a69436
+abcef6667beaa72a79f2f2501cb5fdb4
+b07c2f249237d7fbcbcdf92dbcf4971e
+fc6250cf6ffc56b0ec8ad964a9a69436
+1681822340006c4aaac4a787d38632e7
+6367c23c6ef24d13771d4d913aa61ede
+8e413fb567af43774a0548f33512345f
+084390594f9d8ede69731a920d38f669
+75204bf7b031b7ed42afa3e6e0d09ac2
+97b50503eb91515245ea9ad635f6d923
+aa0b5e6d8ebd25852828322e0582e757
+fcd4ff5c50b856e22c6382cfc7b24668
+7ea90731233366e181a020e8cb86b9ce
+fcd4ff5c50b856e22c6382cfc7b24668
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+f2ac545a54047af17df7a836c06da788
+aa0b5e6d8ebd25852828322e0582e757
+35d1cf51d69e59eb7362ba1234632091
+97722671e472f38a7de77ba3adc8514d
+8e413fb567af43774a0548f33512345f
+b2537edc069d6a7cf459414bd9d68132
+6367c23c6ef24d13771d4d913aa61ede
+abcef6667beaa72a79f2f2501cb5fdb4
+abcef6667beaa72a79f2f2501cb5fdb4
+f2ac545a54047af17df7a836c06da788
+084390594f9d8ede69731a920d38f669
+97722671e472f38a7de77ba3adc8514d
+aa0b5e6d8ebd25852828322e0582e757
+084390594f9d8ede69731a920d38f669
+a249a9a5fa938d1ede64e155d4a84fa1
+35d1cf51d69e59eb7362ba1234632091
+97b50503eb91515245ea9ad635f6d923
+aa0b5e6d8ebd25852828322e0582e757
+8e413fb567af43774a0548f33512345f
+fcd4ff5c50b856e22c6382cfc7b24668
+fc6250cf6ffc56b0ec8ad964a9a69436
+a249a9a5fa938d1ede64e155d4a84fa1
+ddfe22f2283da4f48ef2fd804694e391
+35d1cf51d69e59eb7362ba1234632091
+a76d4d61bf869a8ee2e5431ce64417b4
+aa0b5e6d8ebd25852828322e0582e757
+a155270568e947ad38a58cd265340a67
+b2537edc069d6a7cf459414bd9d68132
+fc6250cf6ffc56b0ec8ad964a9a69436
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+695b918897337b345cef6e4d0549187b
+aa0b5e6d8ebd25852828322e0582e757
+a76d4d61bf869a8ee2e5431ce64417b4
+ac62d6e3cec72fa724c26d85e2de9012
+fcd4ff5c50b856e22c6382cfc7b24668
+fc6250cf6ffc56b0ec8ad964a9a69436
+75204bf7b031b7ed42afa3e6e0d09ac2
+b2537edc069d6a7cf459414bd9d68132
+a76d4d61bf869a8ee2e5431ce64417b4
+084390594f9d8ede69731a920d38f669
+695b918897337b345cef6e4d0549187b
+aa0b5e6d8ebd25852828322e0582e757
+a155270568e947ad38a58cd265340a67
+aa0b5e6d8ebd25852828322e0582e757
+61c4c070e25569723ec1237a58b2444c
+35d1cf51d69e59eb7362ba1234632091
+a249a9a5fa938d1ede64e155d4a84fa1
+ddfe22f2283da4f48ef2fd804694e391
+f2ac545a54047af17df7a836c06da788
+aa0b5e6d8ebd25852828322e0582e757
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+35d1cf51d69e59eb7362ba1234632091
+b2537edc069d6a7cf459414bd9d68132
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+ddfe22f2283da4f48ef2fd804694e391
+6367c23c6ef24d13771d4d913aa61ede
+a76d4d61bf869a8ee2e5431ce64417b4
+aa0b5e6d8ebd25852828322e0582e757
+f2ac545a54047af17df7a836c06da788
+ac62d6e3cec72fa724c26d85e2de9012
+b07c2f249237d7fbcbcdf92dbcf4971e
+aa0b5e6d8ebd25852828322e0582e757
+a76d4d61bf869a8ee2e5431ce64417b4
+aa0b5e6d8ebd25852828322e0582e757
+b2537edc069d6a7cf459414bd9d68132
+fc6250cf6ffc56b0ec8ad964a9a69436
+8e413fb567af43774a0548f33512345f
+b07c2f249237d7fbcbcdf92dbcf4971e
+fc6250cf6ffc56b0ec8ad964a9a69436
+1681822340006c4aaac4a787d38632e7
+b07c2f249237d7fbcbcdf92dbcf4971e
+fc6250cf6ffc56b0ec8ad964a9a69436
+1681822340006c4aaac4a787d38632e7
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+aa0b5e6d8ebd25852828322e0582e757
+35d1cf51d69e59eb7362ba1234632091
+b2537edc069d6a7cf459414bd9d68132
+b2537edc069d6a7cf459414bd9d68132
+35d1cf51d69e59eb7362ba1234632091
+fcd4ff5c50b856e22c6382cfc7b24668
+97722671e472f38a7de77ba3adc8514d
+084390594f9d8ede69731a920d38f669
+a155270568e947ad38a58cd265340a67
+aa0b5e6d8ebd25852828322e0582e757
+35d1cf51d69e59eb7362ba1234632091
+1681822340006c4aaac4a787d38632e7
+fc6250cf6ffc56b0ec8ad964a9a69436
+a76d4d61bf869a8ee2e5431ce64417b4
+97722671e472f38a7de77ba3adc8514d
+8e413fb567af43774a0548f33512345f
+fc6250cf6ffc56b0ec8ad964a9a69436
+b07c2f249237d7fbcbcdf92dbcf4971e
+35d1cf51d69e59eb7362ba1234632091
+f2ac545a54047af17df7a836c06da788
+8e413fb567af43774a0548f33512345f
+fc6250cf6ffc56b0ec8ad964a9a69436
+b2537edc069d6a7cf459414bd9d68132
+b07c2f249237d7fbcbcdf92dbcf4971e
+aa0b5e6d8ebd25852828322e0582e757
+35d1cf51d69e59eb7362ba1234632091
+75204bf7b031b7ed42afa3e6e0d09ac2
+8e413fb567af43774a0548f33512345f
+1681822340006c4aaac4a787d38632e7
+aa0b5e6d8ebd25852828322e0582e757
+a76d4d61bf869a8ee2e5431ce64417b4
+084390594f9d8ede69731a920d38f669
+8e413fb567af43774a0548f33512345f
+fc6250cf6ffc56b0ec8ad964a9a69436
+695b918897337b345cef6e4d0549187b
+aa0b5e6d8ebd25852828322e0582e757
+a76d4d61bf869a8ee2e5431ce64417b4
+8e413fb567af43774a0548f33512345f
+b2537edc069d6a7cf459414bd9d68132
+35d1cf51d69e59eb7362ba1234632091
+abcef6667beaa72a79f2f2501cb5fdb4
+abcef6667beaa72a79f2f2501cb5fdb4
+aa0b5e6d8ebd25852828322e0582e757
+a155270568e947ad38a58cd265340a67
+</code></pre></div></div>
+
+
+</article>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>

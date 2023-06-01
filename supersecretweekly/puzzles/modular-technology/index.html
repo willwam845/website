@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/normalize.css">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/ockham.css">
+  <script async src="/supersecretweekly/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> Modular Technology | willwam845 </title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PPZXWFFSPB');
+</script>
+
+<script>
+  async function submitAnswer(){
+    answerBox = document.getElementById("answerbox")
+    submitBox = document.getElementById("submitbox")
+    answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
+    submitBox.innerHTML = "Submitting..."
+    for (i=0;i<25000;i++){
+      answer = await sha256(answer)
+    }
+    window.location = window.location.href + answer + ".html";
+  }
+
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);                    
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+</script>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/supersecretweekly/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/supersecretweekly/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/supersecretweekly/about" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/supersecretweekly/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">Modular Technology</h1>
+    <div class="form-group">
+      <input id="answerbox" class="form-control" type="text" name="answer" placeholder="Answer" required>
+    </div>
+    <div class="form-group">
+      <button id="submitbox" class="btn btn-primary" onclick="submitAnswer()">Check Answer</button>
+    </div>
+
+  <h4 id="ooo-scary-maths-one-here-so-scary"><i>ooo scary maths one here (so scary)</i></h4>
+
+<p><a href="/puzzles/baby-modular-technology/">intro puzzle</a></p>
+
+<h5 id="challenge-script">Challenge script:</h5>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">getPrime</span>
+
+<span class="n">SECRET_MESSAGE</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"This is a fake message. You need to use the output to recover the real message."</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">SECRET_MESSAGE</span><span class="p">)</span> <span class="o">==</span> <span class="mi">79</span>
+
+<span class="k">def</span> <span class="nf">bytes_to_long</span><span class="p">(</span><span class="n">byte_string</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">byte_string</span><span class="p">.</span><span class="nb">hex</span><span class="p">(),</span> <span class="mi">16</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">long_to_bytes</span><span class="p">(</span><span class="n">integer</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">bytes</span><span class="p">.</span><span class="n">fromhex</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">integer</span><span class="p">)[</span><span class="mi">2</span><span class="p">:])</span>
+
+<span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">1024</span><span class="p">),</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span> <span class="c1"># generate two large primes
+</span><span class="n">modulus</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="c1"># multiply them together
+</span><span class="n">exponent</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="k">print</span><span class="p">(</span><span class="n">modulus</span><span class="p">)</span>
+<span class="k">print</span><span class="p">((</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">SECRET_MESSAGE</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulus</span><span class="p">)</span> <span class="c1"># encrypt using RSA, by doing pt raised to the power of exponent (3) modulo the modulus
+</span></code></pre></div></div>
+
+<h5 id="output">Output:</h5>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>25470107759908677227885059212049756476123587149099142377016782162035805692074354189159652091227375655135235368525396923393193646546513521594944466326848816352402770223540805069572455324213054236364701194222702095208890524652925607023595668703783127183044393213645665205889410585077610562587713813622057509622269267198359881821074334152602300114571365555728950484656802303612207021927556708344318318072640242977400728587542260343845271163234654779873505149665431736959069216295088527262802330309349882249615288926177838418478128072496420250629745101514345301311073925631956844826768645400016556267536370392654365461821
+454147422122408638236729228778619151840745110573901635266653412884827448174696657067161863712007472045862643664187179466863186606693544670825981955322220612714094448031487713801162618522078593851990811307326192227448461688364355030506264012718298715849972685746984958365293426324609917961631777964113223482455400203888938149651008187748240438990178348789806411004166592944184851235951272579621706914933443403222482532359174060018780965662299105233528835083965863568231382797401795357662064127581799775007005491721985455877597766465099098235202614183072688947734662600789
+</code></pre></div></div>
+
+
+</article>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>

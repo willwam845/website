@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/normalize.css">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/ockham.css">
+  <script async src="/supersecretweekly/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> home | willwam845 </title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PPZXWFFSPB');
+</script>
+
+<script>
+  async function submitAnswer(){
+    answerBox = document.getElementById("answerbox")
+    submitBox = document.getElementById("submitbox")
+    answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
+    submitBox.innerHTML = "Submitting..."
+    for (i=0;i<25000;i++){
+      answer = await sha256(answer)
+    }
+    window.location = window.location.href + answer + ".html";
+  }
+
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);                    
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+</script>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/supersecretweekly/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/supersecretweekly/" class="sidebar-nav-item active">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/supersecretweekly/about" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/supersecretweekly/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          
+
+<div class="posts">
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/the-ghostly-witch/">
+          The Ghostly Witch
+        </a>
+      </h2>
+      tags: 
+      
+        <span>puzzle</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/always/">
+          Always
+        </a>
+      </h2>
+      tags: 
+      
+        <span>puzzle</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/alice-and-friends/">
+          Alice and Friends
+        </a>
+      </h2>
+      tags: 
+      
+        <span>puzzle</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/x-slash-6/">
+          X/6
+        </a>
+      </h2>
+      tags: 
+      
+        <span>puzzle</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/places-where-cat-should-not-be/">
+          places where cat should not be
+        </a>
+      </h2>
+      tags: 
+      
+        <span>puzzle</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/two-time-pad/">
+          Two Time Pad
+        </a>
+      </h2>
+      tags: 
+      
+        <span>technical</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/electricode/">
+          Electricode
+        </a>
+      </h2>
+      tags: 
+      
+        <span>technical</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/vigenere-cbc/">
+          Vigenere CBC
+        </a>
+      </h2>
+      tags: 
+      
+        <span>technical</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/modular-technology/">
+          Modular Technology
+        </a>
+      </h2>
+      tags: 
+      
+        <span>technical</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/equals-equals/">
+          ==
+        </a>
+      </h2>
+      tags: 
+      
+        <span>technical?</span>, 
+        <span>puzzle?</span>
+    </div>
+  
+    <div class="post-entry">
+      <h2 class="post-title">
+        <a href="/supersecretweekly/puzzles/meta/">
+          <b>Rolling Your Own</b>
+        </a>
+      </h2>
+      tags: 
+      
+        <span>meta</span>
+    </div>
+  
+</div>
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>
