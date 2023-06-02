@@ -32,27 +32,6 @@
   gtag('js', new Date());
   gtag('config', 'G-PPZXWFFSPB');
 </script>
-
-<script>
-  async function submitAnswer(){
-    answerBox = document.getElementById("answerbox")
-    submitBox = document.getElementById("submitbox")
-    answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
-    submitBox.innerHTML = "Submitting..."
-    for (i=0;i<25000;i++){
-      answer = await sha256(answer)
-    }
-    window.location = window.location.href + answer + ".html";
-  }
-
-  async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);                    
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
-}
-</script>
 </head>
 
 

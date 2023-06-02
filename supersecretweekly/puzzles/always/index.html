@@ -32,27 +32,6 @@
   gtag('js', new Date());
   gtag('config', 'G-PPZXWFFSPB');
 </script>
-
-<script>
-  async function submitAnswer(){
-    answerBox = document.getElementById("answerbox")
-    submitBox = document.getElementById("submitbox")
-    answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
-    submitBox.innerHTML = "Submitting..."
-    for (i=0;i<25000;i++){
-      answer = await sha256(answer)
-    }
-    window.location = window.location.href + answer + ".html";
-  }
-
-  async function sha256(message) {
-    const msgBuffer = new TextEncoder().encode(message);                    
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    return hashHex;
-}
-</script>
 </head>
 
 
@@ -117,13 +96,73 @@
 
         <main>
           <article class="post">
+  <script>
+    function checkURL(url) {
+      var http = new XMLHttpRequest();
+      http.open('HEAD', url, false);
+      http.send();
+      if (http.status != 404)
+          return true;
+      else
+          return false;
+    }
+
+    function updateText(response, answer="", answerURL=""){
+      textResponse = document.getElementById("responsetext")
+      switch(response){
+        case "correct!!":
+          window.location = answerURL.slice(0, -5) + "/success.html";
+          break;
+        case "correct!":
+          textResponse.outerHTML = `<h5 id="responsetext" style="color:green">correct! ${answer} is the correct answer :)</h5>`;
+          break;
+        case "incorrect!":
+          textResponse.outerHTML = `<h5 id="responsetext" style="color:red">sorry, ${answer} is not the correct answer :(</h5>`;
+          break;
+        default:
+          textResponse.outerHTML = `<h5 id="responsetext" style="color:yellow">${response} (${answer})</h5>`;
+      }
+    }
+
+    async function submitAnswer(){
+      textResponse = document.getElementById("responsetext")
+      textResponse.outerHTML = '<h5 id="responsetext"></h5>'
+      answerBox = document.getElementById("answerbox")
+      submitBox = document.getElementById("submitbox")
+      answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
+      rawanswer = answer;
+      submitBox.innerHTML = "Submitting..."
+      for (i=0;i<25000;i++){
+        answer = await sha256(answer)
+      }
+      answerURL = window.location.href + answer + ".html";
+      submitBox.innerHTML = "Check Answer"
+      if (checkURL(answerURL)){
+        fetch(answerURL)
+        .then(response => response.text())
+        .then(text => updateText(text, rawanswer, answerURL))
+      }
+      else {
+        updateText("incorrect!", rawanswer)
+      }
+    }
+  
+    async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);                    
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashHex;
+  }
+  </script>
   <h1 class="post-title">Always</h1>
     <div class="form-group">
-      <input id="answerbox" class="form-control" type="text" name="answer" placeholder="Answer" required>
+      <input id="answerbox" class="input-box" type="text" name="answer" placeholder="Answer" required>
     </div>
     <div class="form-group">
-      <button id="submitbox" class="btn btn-primary" onclick="submitAnswer()">Check Answer</button>
+      <button class="submit-button" role="button" id="submitbox" onclick="submitAnswer()">Check Answer</button>
     </div>
+    <h5 id="responsetext"></h5>
 
   <h4 id="heres-your-obligatory-always-puzzle"><i>here’s your obligatory “always” puzzle</i></h4>
 
