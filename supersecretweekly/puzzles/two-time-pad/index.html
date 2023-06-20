@@ -132,7 +132,7 @@
       answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
       rawanswer = answer;
       submitBox.innerHTML = "Submitting..."
-      for (i=0;i<25000;i++){
+      for (i=0;i<50000;i++){
         answer = await sha256(answer)
       }
       answerURL = window.location.href + answer + ".html";
@@ -166,8 +166,6 @@
 
   <h4 id="surely-using-it-just-one-more-time-is-fine-right"><i>surely using it just one more time is fine right?</i></h4>
 
-<p>The script below is the script used to generate the output below it. The only things that have been changed is the contents of the secret message itself, which has been replaced. The public message has remained the same.</p>
-  
 <h5 id="challenge-script">Challenge Script:</h5>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">os</span>
@@ -185,8 +183,8 @@
 </code></pre></div></div>
 
 <h5 id="output">Output:</h5>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>34b64387d4122a2a66d9fd88346c441f12071eded2dea2ac820ccea9c7e3ceaf2eee2475c9568ca4d75097adc577df727970a485771ac1bbcfc1dcc37dc3c1b6354848dfe728c9d50765b3c5a461a5603bd02a14c9af9ff8adc96d9d7da8bb88844cd5f032eaf93e870857f61e5215cbbe7e78
-3fbc418cc9527e0b62d1fac13271175e5d1b5bd9d790aba09f188fbacaa49dc732fc2271c95080e9dd4190adcb7c983c4a38b5cd7f0792bbc5dddbce32d188ae350d5590e66788c80b73b6c5be26f73362fb1a75f382daccc8f343f14f98
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bb3652a6ccc9729d566062032f38015a24c66639f8ed9e0ddf97183c08584cf845a5a7fa76d0ec819f2628db218430fb29b810d46f9997b1a20663801134a0e44134ef0972842dffae55cd5913b8f922a429b921184062d19262c94eaf81cbbb8586e0615211f4f7409a2a40ec0804e3b7fde9
+b03c50add18926bc5268654a2925521b6bda233efda39701c283592f051f1f9059b7a1fe76d6e0cc95372fdb2f8f77b51af0019c6784c4b1a81a648d5e26e9fc4171f24673cb6ce2a243c85909ffab71fd028940226d27e5f758e7229da1e08c
 </code></pre></div></div>
 
 

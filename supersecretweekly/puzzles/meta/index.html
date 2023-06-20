@@ -23,7 +23,7 @@
   </script>
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
   
-<title> <b>Rolling Your Own</b> | willwam845 </title>
+<title> Rolling Your Own | willwam845 </title>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
 <script>
@@ -132,7 +132,7 @@
       answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
       rawanswer = answer;
       submitBox.innerHTML = "Submitting..."
-      for (i=0;i<25000;i++){
+      for (i=0;i<50000;i++){
         answer = await sha256(answer)
       }
       answerURL = window.location.href + answer + ".html";
@@ -164,7 +164,7 @@
     </div>
     <h5 id="responsetext"></h5>
 
-  <h4 id="were-doing-some-mixing-and-matching-with-our-cryptography-primitives-but-we-cant-get-anything-to-work-what-can-we-do-to-improve-our-security"><i>We’re doing some mixing and matching with our cryptography primitives, but we can’t get anything to work. <b>What can we do to improve our security?</b></i></h4>
+  <h4 id="were-doing-some-mixing-and-matching-with-our-methods-but-our-stuff-still-doesnt-seem-to-be-secure-what-can-we-do-to-improve-our-security"><i>We’re doing some mixing and matching with our methods, but our stuff still doesn’t seem to be secure. <b>What can we do to improve our security?</b></i></h4>
 
 <p><img src="meta.png" alt="" /></p>
 

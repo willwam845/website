@@ -132,7 +132,7 @@
       answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
       rawanswer = answer;
       submitBox.innerHTML = "Submitting..."
-      for (i=0;i<25000;i++){
+      for (i=0;i<50000;i++){
         answer = await sha256(answer)
       }
       answerURL = window.location.href + answer + ".html";
@@ -166,8 +166,6 @@
 
   <h4 id="ooo-scary-maths-one-here-so-scary"><i>ooo scary maths one here (so scary)</i></h4>
 
-<p>The script below is the script used to generate the output below it. The only thing that has been changed is the contents of the secret message itself, which has been replaced with a secret message of identical length.</p>
-
 <h5 id="challenge-script">Challenge script:</h5>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">getPrime</span>
@@ -185,13 +183,15 @@
 </span><span class="n">modulus</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="c1"># multiply them together
 </span><span class="n">exponent</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="k">print</span><span class="p">(</span><span class="n">modulus</span><span class="p">)</span>
-<span class="k">print</span><span class="p">((</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">SECRET_MESSAGE</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulus</span><span class="p">)</span> <span class="c1"># encrypt using RSA, by doing pt raised to the power of exponent (1) modulo the modulus
+<span class="k">print</span><span class="p">((</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">SECRET_MESSAGE</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulus</span><span class="p">)</span> <span class="c1"># encrypt using RSA, by doing pt raised to the power of exponent (3) modulo the modulus
 </span></code></pre></div></div>
 
 <h5 id="output">Output:</h5>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>17845097488596639845518134386175507154138020633028978410599492028517185249762037941921834310735343524416248353253297004195034415311652348836343210124772724156933556474501204108447031043065370143020118340841009308082569275068337588680708705817539633555913471436360805549182752511044555690261882864681449364372080830664440708636199339903319195562063527895839659283871512345578702252921421500462837606285164842704956629612659250186753272777602890359528736658773682337895707675287899998993856744285265279750099474752160466960081514750255995189850248416415689506400427175761412047149724013540570133933037768024101486378921
 4464546116043465080725086728135721186421551998994298185795184113369194141931808356261973191771603232472347856620304536340486415244048057136394402648172582167263525763507999892546695785155389836019857067059329844145393639738027314536187312344281320972310479504663255912873389143515679290355306708678056818192416702976443834017292358856475472481820752295754775314065426809062967610934573792037574956623980674960412246584165785102773939556164134182466021463864399364067784086516913366386
 </code></pre></div></div>
+
+<p>note: <a href="https://www.dcode.fr/en">dcode.fr</a> can be used to deal with any large number operations</p>
 
 
 </article>

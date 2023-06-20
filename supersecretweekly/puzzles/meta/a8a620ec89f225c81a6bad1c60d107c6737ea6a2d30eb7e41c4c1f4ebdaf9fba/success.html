@@ -23,7 +23,7 @@
   </script>
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
   
-<title> home | willwam845 </title>
+<title> Weekly Solved! | willwam845 </title>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
 <script>
@@ -31,6 +31,27 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-PPZXWFFSPB');
+</script>
+
+<script>
+  async function submitAnswer(){
+    answerBox = document.getElementById("answerbox")
+    submitBox = document.getElementById("submitbox")
+    answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
+    submitBox.innerHTML = "Submitting..."
+    for (i=0;i<25000;i++){
+      answer = await sha256(answer)
+    }
+    window.location = window.location.href + answer + ".html";
+  }
+
+  async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);                    
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
 </script>
 </head>
 
@@ -47,7 +68,7 @@
     <ul class="sidebar-nav-list">
     
       <li">
-        <a href="/supersecretweekly/" class="sidebar-nav-item active">
+        <a href="/supersecretweekly/" class="sidebar-nav-item ">
           home
         </a>
       </li>
@@ -95,132 +116,15 @@
         </header>
 
         <main>
-          
+          <article class="post">
+  <h1 class="post-title">Congratulations!!</h1>
 
-<div class="posts">
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/the-ghostly-witch/">
-          The Ghostly Witch
-        </a>
-      </h2>
-      tags: 
-      
-        <span>puzzle</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/generic-morse-puzzle/">
-          generic morse puzzle
-        </a>
-      </h2>
-      tags: 
-      
-        <span>puzzle</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/alice-and-friends/">
-          Alice and Friends
-        </a>
-      </h2>
-      tags: 
-      
-        <span>puzzle</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/x-slash-6/">
-          X/6
-        </a>
-      </h2>
-      tags: 
-      
-        <span>puzzle</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/cat-pictures/">
-          cat pictures
-        </a>
-      </h2>
-      tags: 
-      
-        <span>puzzle</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/two-time-pad/">
-          Two Time Pad
-        </a>
-      </h2>
-      tags: 
-      
-        <span>technical</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/electricode/">
-          Electricode
-        </a>
-      </h2>
-      tags: 
-      
-        <span>technical</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/vigenere-cbc/">
-          Vigenere CBC
-        </a>
-      </h2>
-      tags: 
-      
-        <span>technical</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/modular-technology/">
-          Modular Technology
-        </a>
-      </h2>
-      tags: 
-      
-        <span>technical</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/equals-equals/">
-          ==
-        </a>
-      </h2>
-      tags: 
-      
-        <span>technical?</span>, 
-        <span>puzzle?</span>
-    </div>
-  
-    <div class="post-entry">
-      <h2 class="post-title">
-        <a href="/supersecretweekly/puzzles/meta/">
-          <b>Rolling Your Own</b>
-        </a>
-      </h2>
-      tags: 
-      
-        <span>meta</span>
-    </div>
-  
-</div>
+
+  <h4 id="heres-your-obligatory-always-puzzle"><i>your final answer is <code class="language-plaintext highlighter-rouge">enigmatics{4nd_n0w_w3_kn0w_n0t_t0_r0ll_0ur_0wn}</code></i></h4>
+
+
+</article>
+
         </main>
 
         <footer class="footer">

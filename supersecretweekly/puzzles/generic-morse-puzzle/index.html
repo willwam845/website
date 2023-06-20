@@ -23,7 +23,7 @@
   </script>
   <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
   
-<title> Always | willwam845 </title>
+<title> generic morse puzzle | willwam845 </title>
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
 <script>
@@ -132,7 +132,7 @@
       answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
       rawanswer = answer;
       submitBox.innerHTML = "Submitting..."
-      for (i=0;i<25000;i++){
+      for (i=0;i<50000;i++){
         answer = await sha256(answer)
       }
       answerURL = window.location.href + answer + ".html";
@@ -155,7 +155,7 @@
       return hashHex;
   }
   </script>
-  <h1 class="post-title">Always</h1>
+  <h1 class="post-title">generic morse puzzle</h1>
     <div class="form-group">
       <input id="answerbox" class="input-box" type="text" name="answer" placeholder="Answer" required>
     </div>
@@ -164,7 +164,7 @@
     </div>
     <h5 id="responsetext"></h5>
 
-  <h4 id="heres-your-obligatory-always-puzzle"><i>here’s your obligatory “always” puzzle</i></h4>
+  <h4 id="heres-your-generic-morse-puzzle"><i>here’s your generic morse puzzle</i></h4>
 
 <p><img src="example.png" alt="" />
 <img src="grid1.png" alt="" />

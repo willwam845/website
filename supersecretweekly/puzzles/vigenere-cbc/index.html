@@ -132,7 +132,7 @@
       answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
       rawanswer = answer;
       submitBox.innerHTML = "Submitting..."
-      for (i=0;i<25000;i++){
+      for (i=0;i<50000;i++){
         answer = await sha256(answer)
       }
       answerURL = window.location.href + answer + ".html";
@@ -167,8 +167,6 @@
   <h4 id="cbc-is-better-than-ecb-mode-because-it-makes-things-more-secure-right"><i>CBC is better than ECB mode, because it makes things more secure, right?</i></h4>
 
 <p><a href="/supersecretweekly/puzzles/baby-vigenere-cbc/">intro puzzle</a></p>
-
-<p>The script below is the script used to generate the output below it. The only things that have been changed is the contents of the secret message itself, and the key</p>
 
 <h5 id="challenge-script">Challenge script:</h5>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">random</span>
