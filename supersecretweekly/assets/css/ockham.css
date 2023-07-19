@@ -6,18 +6,18 @@
   --body-font-size: 16px;
   --body-line-height: 1.5;
   --body-color: #ced4da;
-  --body-bg: #212529;
-  --link-color: #74c0fc;
+  --body-bg: #0d1431;
+  --link-color: #abff00;
   --heading-font: "Inter", -apple-system, "avenir next", avenir, roboto, noto, ubuntu, "helvetica neue", helvetica, sans-serif;
-  --heading-color: #99e9f2;
+  --heading-color: #abff00;
   --code-font: ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace;
   --code-bg: #495057;
   --border-radius: .8em;
   --border-color: #495057;
-  --title-color: #74c0fc;
+  --title-color: #abff00;
   --sidebar-width: 16rem;
   --sidebar-color: #adb5bd;
-  --sidebar-bg: #343a40; }
+  --sidebar-bg: #111f3d; }
 
 @media (min-width: 48rem) {
   :root {

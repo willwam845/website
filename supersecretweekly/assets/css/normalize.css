@@ -348,9 +348,14 @@ template {
   display: none;
 }
 
+.input-box {
+  border-radius: 6px;
+  padding: 4px;
+}
+
 .submit-button {
   appearance: none;
-  background-color: #89ddf3;
+  background-color: #1c7183;
   border: 1px solid rgba(27, 31, 35, .15);
   border-radius: 6px;
   box-shadow: rgba(27, 31, 35, .1) 0 1px 0;
@@ -378,10 +383,10 @@ template {
 }
 
 .submit-button:hover {
-  background-color: #84d8e9;
+  background-color: #1c51d9;
 }
 
 .submit-button:active {
-  background-color: #84d8e9;
+  background-color: #1c51d9;
   box-shadow: rgba(20, 70, 32, .2) 0 1px 0 inset;
 }

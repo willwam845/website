@@ -96,69 +96,11 @@
 
         <main>
           <article class="post">
-  <script>
-    function checkURL(url) {
-      var http = new XMLHttpRequest();
-      http.open('HEAD', url, false);
-      http.send();
-      if (http.status != 404)
-          return true;
-      else
-          return false;
-    }
-
-    function updateText(response, answer="", answerURL=""){
-      textResponse = document.getElementById("responsetext")
-      switch(response){
-        case "correct!!":
-          window.location = answerURL.slice(0, -5) + "/success.html";
-          break;
-        case "correct!":
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:green">correct! ${answer} is the correct answer :)</h5>`;
-          break;
-        case "incorrect!":
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:red">sorry, ${answer} is not the correct answer :(</h5>`;
-          break;
-        default:
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:yellow">${response} (${answer})</h5>`;
-      }
-    }
-
-    async function submitAnswer(){
-      textResponse = document.getElementById("responsetext")
-      textResponse.outerHTML = '<h5 id="responsetext"></h5>'
-      answerBox = document.getElementById("answerbox")
-      submitBox = document.getElementById("submitbox")
-      answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
-      rawanswer = answer;
-      submitBox.innerHTML = "Submitting..."
-      for (i=0;i<50000;i++){
-        answer = await sha256(answer)
-      }
-      answerURL = window.location.href + answer + ".html";
-      submitBox.innerHTML = "Check Answer"
-      if (checkURL(answerURL)){
-        fetch(answerURL)
-        .then(response => response.text())
-        .then(text => updateText(text, rawanswer, answerURL))
-      }
-      else {
-        updateText("incorrect!", rawanswer)
-      }
-    }
-  
-    async function sha256(message) {
-      const msgBuffer = new TextEncoder().encode(message);                    
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      return hashHex;
-  }
-  </script>
   <h1 class="post-title">Modular Technology</h1>
     <div class="form-group">
       <input id="answerbox" class="input-box" type="text" name="answer" placeholder="Answer" required>
     </div>
+    <br>
     <div class="form-group">
       <button class="submit-button" role="button" id="submitbox" onclick="submitAnswer()">Check Answer</button>
     </div>
@@ -168,18 +110,20 @@
 
 <p><a href="/supersecretweekly/puzzles/baby-modular-technology/">intro puzzle</a></p>
 
-<h5 id="challenge-script">Challenge script:</h5>
+<p><button class="submit-button" role="button" onclick="copyToClipboard(2)">Copy challenge to clipboard</button>
+<button class="submit-button" role="button" onclick="copyToClipboard(3)">Copy output to clipboard</button></p>
 
+<h5 id="challenge-script">Challenge script:</h5>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">Crypto.Util.number</span> <span class="kn">import</span> <span class="n">getPrime</span>
 
 <span class="n">SECRET_MESSAGE</span> <span class="o">=</span> <span class="sa">b</span><span class="s">"This is a fake message. You need to use the output to recover the real message."</span>
 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">SECRET_MESSAGE</span><span class="p">)</span> <span class="o">==</span> <span class="mi">79</span>
 
-<span class="k">def</span> <span class="nf">bytes_to_long</span><span class="p">(</span><span class="n">byte_string</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">byte_string</span><span class="p">.</span><span class="nb">hex</span><span class="p">(),</span> <span class="mi">16</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c1"># converts number to 256 bytes (base 10 -&gt; base256)
+</span>    <span class="k">return</span> <span class="n">x</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="s">"big"</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">long_to_bytes</span><span class="p">(</span><span class="n">integer</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">bytes</span><span class="p">.</span><span class="n">fromhex</span><span class="p">(</span><span class="nb">hex</span><span class="p">(</span><span class="n">integer</span><span class="p">)[</span><span class="mi">2</span><span class="p">:])</span>
+<span class="k">def</span> <span class="nf">from_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c1"># converts 256 bytes to number (base256 -&gt; base 10)
+</span>    <span class="k">return</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s">"big"</span><span class="p">)</span>
 
 <span class="n">p</span><span class="p">,</span> <span class="n">q</span> <span class="o">=</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">1024</span><span class="p">),</span> <span class="n">getPrime</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span> <span class="c1"># generate two large primes
 </span><span class="n">modulus</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="c1"># multiply them together
@@ -195,6 +139,15 @@
 
 <p>note: <a href="https://www.dcode.fr/en">dcode.fr</a> can be used to deal with any large number operations</p>
 
+<div id="puzzleId" hidden="">2</div>
+<script src="/supersecretweekly/assets/js/puzzleutil.js"></script>
+
+<script>initialize()</script>
+
+
+
+<script async src="/supersecretweekly/assets/js/puzzleutil.js"></script>
+<script async src="/supersecretweekly/assets/js/puzzletexts.js"></script>
 
 </article>
 

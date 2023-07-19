@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon.ico">
+  <link rel="mask-icon" href="/assets/img/favicon.ico">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/normalize.css">
+  <link rel="stylesheet" href="/supersecretweekly/assets/css/ockham.css">
+  <script async src="/supersecretweekly/assets/js/ockham.js"></script>
+  <script async src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+        inlineMath: [['$','$']]
+      }
+    });
+  </script>
+  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script> 
+  
+<title> magic random | willwam845 </title>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PPZXWFFSPB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-PPZXWFFSPB');
+</script>
+</head>
+
+
+  <body>
+    <input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-item">
+    <img src="/supersecretweekly/assets/img/melon.png" class="pfp">
+  </div>
+
+  
+  <nav class="sidebar-nav">
+    <ul class="sidebar-nav-list">
+    
+      <li">
+        <a href="/supersecretweekly/" class="sidebar-nav-item ">
+          home
+        </a>
+      </li>
+    
+      <li">
+        <a href="/supersecretweekly/about" class="sidebar-nav-item ">
+          about
+        </a>
+      </li>
+    
+    </ul>
+  </nav>
+  
+
+  
+  <div class="sidebar-item">
+    
+      <a class="social-icon" href="https://twitter.com/willwam845" target="_blank">
+        <i class="fab fa-twitter" title="twitter"></i>
+      </a>
+    
+      <a class="social-icon" href="https://github.com/willwam845" target="_blank">
+        <i class="fab fa-github" title="gitHub"></i>
+      </a>
+    
+  </div>
+  
+
+  <div class="sidebar-item">
+    <small>
+      powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> & <a href="https://github.com/zivong/ockham" target="_blank">Ockham</a>
+    </small>
+  </div>
+</div>
+
+
+    <div class="wrap">
+      <div class="container">
+
+        <header class="masthead">
+          <div class="masthead-title">
+            <a href="/supersecretweekly/" title="Home">willwam845</a>
+            <small></small>
+          </div>
+        </header>
+
+        <main>
+          <article class="post">
+  <h1 class="post-title">magic random</h1>
+    <div class="form-group">
+      <input id="answerbox" class="input-box" type="text" name="answer" placeholder="Answer" required>
+    </div>
+    <br>
+    <div class="form-group">
+      <button class="submit-button" role="button" id="submitbox" onclick="submitAnswer()">Check Answer</button>
+    </div>
+    <h5 id="responsetext"></h5>
+
+  <h4><i></i></h4>
+
+<p><a href="/supersecretweekly/puzzles/baby-magic-random/">intro puzzle</a></p>
+
+<p><button class="submit-button" role="button" onclick="copyToClipboard(0)">Copy challenge to clipboard</button>
+<button class="submit-button" role="button" onclick="copyToClipboard(1)">Copy output to clipboard</button></p>
+
+<h5 id="challenge-script">Challenge script:</h5>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">random</span>
+
+<span class="k">def</span> <span class="nf">lcg</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">,</span> <span class="n">increment</span><span class="p">,</span> <span class="n">modulus</span><span class="p">):</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">multiplier</span> <span class="o">*</span> <span class="n">state</span> <span class="o">+</span> <span class="n">increment</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulus</span>
+
+<span class="k">def</span> <span class="nf">xor</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">):</span> <span class="c1"># performs a XOR operation on the key and the plaintext
+</span>    <span class="k">return</span> <span class="nb">bytes</span><span class="p">([</span><span class="n">keybyte</span> <span class="o">^</span> <span class="n">ptbyte</span> <span class="k">for</span> <span class="n">keybyte</span><span class="p">,</span> <span class="n">ptbyte</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">)])</span>
+
+<span class="k">def</span> <span class="nf">to_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c1"># converts number to 4 bytes (base 10 -&gt; base256)
+</span>    <span class="k">return</span> <span class="n">x</span><span class="p">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s">"big"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">from_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">):</span> <span class="c1"># converts 4 bytes to number (base256 -&gt; base 10)
+</span>    <span class="k">return</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s">"big"</span><span class="p">)</span>
+
+<span class="c1"># reads the content of the secret.png file
+</span><span class="n">SECRET_IMAGE</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">"secret.png"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">).</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">modulus</span> <span class="o">=</span> <span class="mh">0xfffffffb</span>
+<span class="n">multiplier</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">modulus</span><span class="p">)</span> <span class="c1"># generates multiplier, increment, state which are in the range of 0 - p
+</span><span class="n">increment</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">modulus</span><span class="p">)</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">random</span><span class="p">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">modulus</span><span class="p">)</span>
+
+<span class="c1"># generates a one time pad using the LCG to generate bytes
+</span><span class="n">otp</span> <span class="o">=</span> <span class="sa">b</span><span class="s">""</span>
+<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">otp</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">lcg</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">multiplier</span><span class="p">,</span> <span class="n">increment</span><span class="p">,</span> <span class="n">modulus</span><span class="p">)</span>
+    <span class="n">otp</span> <span class="o">+=</span> <span class="n">to_bytes</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">SECRET_IMAGE</span><span class="p">,</span> <span class="n">otp</span><span class="p">).</span><span class="nb">hex</span><span class="p">())</span>
+</code></pre></div></div>
+
+<h5 id="output">Output:</h5>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>8744e97298ef7cc1ab909824f356472717bbecaeddca0abf187f30adfa7bd8a438eb099b12466e4cdfd515e98d9f0bc51fa55e59d4e2a963a706261c1c0fcceaac2634794387f588ba8fa62c4b168b7f45de2c3954301c4653c8d2cfab246fd6adc212399eddd999b1d748541c8532aa3c0f22ddc99a0fd4958e836a87d5c12f563decdb33211a14389b2a945995829b07eb0924480d4f665835d66d61a4785a8964d10d50d7f6f690f5965d38ed141c4838c76a81b9a0df48939d17e59f0d82139e5110856d7033811de19f68b1f51e5aa980d2cb60ba0c5957d5384a1fc6837ead7bf869ddacffe71774a1a66d310cd11b9a123502980a9dac32469302fb234ece786c5d066a5dc3823585d7927e53f405294a2bc8686a6396337c2c9ad6736e69295e94e8e320dcebb2c7ea541e8457d61f43c1dabdaa3d31ea94950f8afb0f7937f8cbb11f807ea247db91e5fa1fd3a9686a01e62127e286811b1e42a6c6321e6273be69a8053c2e0c57587e6b96f8d595d4ebb2db4589e60e18931d7acacbb9146d03c7525ad9910a41d79a7b1e23be3fa8673a49d66c9b0017a62dcf2594dd843390419898ce458256898e49615b8cf6257b2b0b2fcde8639f0b879c745aeabf3492ddfd67639bfc2c91713f430d268da2e851d4d6e5fa72db736b10ca0a8fec3bc035eb086fa3903b523cf15d6241c19ece36008bfd5d80814744b17f8b1da27082ad01709044dd96e7adb91fee5e3c41d28288847be8b412f31b4e83de16e1f49eb366d549c4fa6a0cdacdf3362c620859754d225b5a161d1b90271accde0cab1f243308c39bfc8ec3ba3b65bb5b21e4fc9089c7d4f13cf5a5f3f53ea56c98620ad45b51c3386d66d9a8ed3911fa6af786917e900aa57a6a599cd2c7b1e9e9f1fdeefceef14c8607cdf327ec7386cf21e1ae1779d02f6d45d1d32b290cfac9089524f6178986228be808629d2221984b51267bb5e28ac363422393a710d6f0097a9e06e647222f27c09d0de49578f4878000f6cd152ebb83b5d89adaf3df4fa837ba6073d86dedc8ea9de93c5c1036dad9ec0513e91ef80a8e2bf96466706f893c63cca1b5fc32960fcaae91333186595e5a127d75c667f688633a2380219810ae5b419e11b4ac0b17959628399f2b30e44bc09b9bdb6b625efac71bb9d22bae3c08508cbde105ef505217db69a37dd708190a949751962d30a66b835df4acadc68f5aaef0c014f54871af6bed7da6fe86b3b84dbe3202d9f0d12ae880a4ecdfc9ed92a69d97775e7b4d94b03f1fbfccd3b591b5e21b84d09d9e4990aa65159649e9b04ae8bb0e47c2f045b6b45d00a37a37e3d91f813a42e58114a6c0d86e25a5b313e589fa91d8
+</code></pre></div></div>
+
+<div id="puzzleId" hidden="">1</div>
+<script src="/supersecretweekly/assets/js/puzzleutil.js"></script>
+
+<script>initialize()</script>
+
+
+
+<script async src="/supersecretweekly/assets/js/puzzleutil.js"></script>
+<script async src="/supersecretweekly/assets/js/puzzletexts.js"></script>
+
+</article>
+
+        </main>
+
+        <footer class="footer">
+          <small>
+            made with the <a href="https://github.com/zivong/ockham">ockham</a> theme and <a href="https://jekyllrb.com/">jekyll</a> 
+          </small>
+        </footer>
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    
+  </body>
+</html>

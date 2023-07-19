@@ -96,106 +96,64 @@
 
         <main>
           <article class="post">
-  <script>
-    function checkURL(url) {
-      var http = new XMLHttpRequest();
-      http.open('HEAD', url, false);
-      http.send();
-      if (http.status != 404)
-          return true;
-      else
-          return false;
-    }
-
-    function updateText(response, answer="", answerURL=""){
-      textResponse = document.getElementById("responsetext")
-      switch(response){
-        case "correct!!":
-          window.location = answerURL.slice(0, -5) + "/success.html";
-          break;
-        case "correct!":
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:green">correct! ${answer} is the correct answer :)</h5>`;
-          break;
-        case "incorrect!":
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:red">sorry, ${answer} is not the correct answer :(</h5>`;
-          break;
-        default:
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:yellow">${response} (${answer})</h5>`;
-      }
-    }
-
-    async function submitAnswer(){
-      textResponse = document.getElementById("responsetext")
-      textResponse.outerHTML = '<h5 id="responsetext"></h5>'
-      answerBox = document.getElementById("answerbox")
-      submitBox = document.getElementById("submitbox")
-      answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
-      rawanswer = answer;
-      submitBox.innerHTML = "Submitting..."
-      for (i=0;i<50000;i++){
-        answer = await sha256(answer)
-      }
-      answerURL = window.location.href + answer + ".html";
-      submitBox.innerHTML = "Check Answer"
-      if (checkURL(answerURL)){
-        fetch(answerURL)
-        .then(response => response.text())
-        .then(text => updateText(text, rawanswer, answerURL))
-      }
-      else {
-        updateText("incorrect!", rawanswer)
-      }
-    }
-  
-    async function sha256(message) {
-      const msgBuffer = new TextEncoder().encode(message);                    
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      return hashHex;
-  }
-  </script>
   <h1 class="post-title">Alice and Friends</h1>
     <div class="form-group">
       <input id="answerbox" class="input-box" type="text" name="answer" placeholder="Answer" required>
     </div>
+    <br>
     <div class="form-group">
       <button class="submit-button" role="button" id="submitbox" onclick="submitAnswer()">Check Answer</button>
     </div>
     <h5 id="responsetext"></h5>
 
-  <h4 id="alice-should-get-better-taste-in-puzzles-imo"><i>alice should get better taste in puzzles imo</i></h4>
+  <h4 id="these-puzzles-"><i>these puzzles </i></h4>
 
-<p><strong>Alice and her cryptography friends are solving some periodic puzzles!</strong>
+<p><button class="submit-button" role="button" onclick="copyToClipboard(11)">Copy to clipboard</button></p>
+
+<p><strong>Alice and her cryptography friends are solving some seasonal puzzles!</strong>
 <strong>Help them figure out who solved what, what house they are in, and what their favourite puzzle type is!</strong></p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Houses are numbered from 1-6.
-In total, 18 puzzles were solved.
-Everyone solved at least one puzzle.
-Each puzzle was solved at least once.
-The number of puzzles each person solved is within 2 of their house number.
-Three houses in a row have puzzle solve counts one less than their house number.
-Everyone solved The Geometry, except one person, who likes CRYPTIC CROSSWORDS.
-The only puzzles that received more than one solve were The Geometry, The Skeleton, The Shop, and The Mysteries.
-Alice solved the same number of puzzles as her house number, and was the only one to do so.
-Alice solved the most puzzles, and Eve solved the least.
-Alice lives next to someone who likes DROPQUOTES.
-Bob's solves were also all solved by one person.
-Charlie did not solve any puzzles with a number in the final answer, or any puzzles that were made by someone with an O in their name.
-Charlie was the only solver of 3 puzzles. 
-The only other people who got an only solve were Mallory, David and Alice.
-David solved The Eatery.
-Eve lives next to someone who likes CRYPTIC CROSSWORDS.
-Eve does not like MISCELLANEOUS puzzles.
-Mallory was on holiday for all of February 2023, and could not solve any puzzles during that time.
-Mallory solved the second least amount of puzzles.
-The 2 solvers of The Mysteries live next to each other.
-The person with 4 solves likes RUNAROUNDS.
-The solvers of The Shop either live in all odd houses or all even houses.
-The person in house 4 lives next to someone who likes METAMETAS, and did not solve The Skeleton.
-Someone likes ARROW SUDOKUS.
-</code></pre></div></div>
+<ul>
+  <li>Houses are numbered 1-6.</li>
+  <li>All puzzles were solved at least once.</li>
+  <li>Everyone solved at least 1 puzzle.</li>
+  <li>In total there were 18 correct answers submitted across all puzzles.</li>
+  <li>Alice solved the most puzzles, and Eve solved the least.</li>
+  <li>Everyone solved The Verdict, except for one person, who likes CRYPTIC CROSSWORDS.</li>
+  <li>The Verdict was the only puzzle to get more than 2 solves.</li>
+  <li>Alice was the only person to solve the same number of puzzles as her house number.</li>
+  <li>Bob solved The Skeleton.</li>
+  <li>Charlie solved all puzzles with a prime number of characters in their final answer.</li>
+  <li>David did not solve any puzzle with a number in the final answer.</li>
+  <li>Eve lives next to someone who solved the puzzle with a number in its name.</li>
+  <li>Mallory lives next to someone she shared a solve with.</li>
+  <li>Mallory submitted correct answers that totalled 69 characters.</li>
+  <li>Mallory only solved 1 puzzle made by anyone with a name longer than 7 characters.</li>
+  <li>Mallory was on holiday during Feburary 2023, and couldn’t solve any puzzles during that time.</li>
+  <li>Mallory and Alice have no solves in common.</li>
+  <li>Bob, Charlie and David have no solves in common apart from one, which all three of them solved.</li>
+  <li>Combined, Bob, Charlie and David solved a Fibonacci number of unique puzzles.</li>
+  <li>The person in house 1 solved 3 puzzles.</li>
+  <li>The person in house 3 solved the puzzle with the longest answer.</li>
+  <li>The person in house 6 likes RUNAROUNDS.</li>
+  <li>The person in house 6 solved all puzzles made by someone with a k in their name.</li>
+  <li>The only solver of The Shop likes DROPQUOTES.</li>
+  <li>The only solver of The Eatery lives next to the person who likes METAMETAS.</li>
+  <li>The person who likes ARROW SUDOKUS puzzles had all their solves be made by someone with an “a” in their name</li>
+  <li>The person who lives next to Alice solved the puzzle made by the person with a special character in their name.</li>
+  <li>Someone hacked Bob and submitted all of his answers!</li>
+  <li>Someone likes MISCELLANEOUS puzzles.</li>
+</ul>
 
+<div id="puzzleId" hidden="">8</div>
+<script src="/supersecretweekly/assets/js/puzzleutil.js"></script>
+
+<script>initialize()</script>
+
+
+
+<script async src="/supersecretweekly/assets/js/puzzleutil.js"></script>
+<script async src="/supersecretweekly/assets/js/puzzletexts.js"></script>
 
 </article>
 

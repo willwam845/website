@@ -96,69 +96,11 @@
 
         <main>
           <article class="post">
-  <script>
-    function checkURL(url) {
-      var http = new XMLHttpRequest();
-      http.open('HEAD', url, false);
-      http.send();
-      if (http.status != 404)
-          return true;
-      else
-          return false;
-    }
-
-    function updateText(response, answer="", answerURL=""){
-      textResponse = document.getElementById("responsetext")
-      switch(response){
-        case "correct!!":
-          window.location = answerURL.slice(0, -5) + "/success.html";
-          break;
-        case "correct!":
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:green">correct! ${answer} is the correct answer :)</h5>`;
-          break;
-        case "incorrect!":
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:red">sorry, ${answer} is not the correct answer :(</h5>`;
-          break;
-        default:
-          textResponse.outerHTML = `<h5 id="responsetext" style="color:yellow">${response} (${answer})</h5>`;
-      }
-    }
-
-    async function submitAnswer(){
-      textResponse = document.getElementById("responsetext")
-      textResponse.outerHTML = '<h5 id="responsetext"></h5>'
-      answerBox = document.getElementById("answerbox")
-      submitBox = document.getElementById("submitbox")
-      answer = answerBox.value.replace(/[^a-zA-Z]/gi, '').toUpperCase();
-      rawanswer = answer;
-      submitBox.innerHTML = "Submitting..."
-      for (i=0;i<50000;i++){
-        answer = await sha256(answer)
-      }
-      answerURL = window.location.href + answer + ".html";
-      submitBox.innerHTML = "Check Answer"
-      if (checkURL(answerURL)){
-        fetch(answerURL)
-        .then(response => response.text())
-        .then(text => updateText(text, rawanswer, answerURL))
-      }
-      else {
-        updateText("incorrect!", rawanswer)
-      }
-    }
-  
-    async function sha256(message) {
-      const msgBuffer = new TextEncoder().encode(message);                    
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      return hashHex;
-  }
-  </script>
   <h1 class="post-title">Vigenere CBC</h1>
     <div class="form-group">
       <input id="answerbox" class="input-box" type="text" name="answer" placeholder="Answer" required>
     </div>
+    <br>
     <div class="form-group">
       <button class="submit-button" role="button" id="submitbox" onclick="submitAnswer()">Check Answer</button>
     </div>
@@ -168,13 +110,16 @@
 
 <p><a href="/supersecretweekly/puzzles/baby-vigenere-cbc/">intro puzzle</a></p>
 
+<p><button class="submit-button" role="button" onclick="copyToClipboard(4)">Copy challenge to clipboard</button>
+<button class="submit-button" role="button" onclick="copyToClipboard(5)">Copy output to clipboard</button></p>
+
 <h5 id="challenge-script">Challenge script:</h5>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">random</span>
 
 <span class="n">alphabet</span> <span class="o">=</span> <span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span>
 
 <span class="k">def</span> <span class="nf">generate_iv</span><span class="p">(</span><span class="n">block_size</span><span class="p">):</span>
-    <span class="c1"># generates a random string of `block_size` letters 
+    <span class="c1"># generates a random string of block_size letters 
 </span>    <span class="c1"># to be used as the initialization vector for the encryption
 </span>    <span class="k">return</span> <span class="s">""</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">choices</span><span class="p">(</span><span class="n">alphabet</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">block_size</span><span class="p">))</span>
 
@@ -192,7 +137,7 @@
 </span>    <span class="n">plaintext</span> <span class="o">=</span> <span class="n">pad</span><span class="p">(</span><span class="n">key_length</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">)</span>
     <span class="c1"># generates an iv
 </span>    <span class="n">iv</span> <span class="o">=</span> <span class="n">generate_iv</span><span class="p">(</span><span class="n">key_length</span><span class="p">)</span>
-    <span class="c1"># splits the plaintext into blocks of length `key_length`
+    <span class="c1"># splits the plaintext into blocks of length key_length
 </span>    <span class="n">blocks</span> <span class="o">=</span> <span class="p">[</span><span class="n">plaintext</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">key_length</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">plaintext</span><span class="p">),</span> <span class="n">key_length</span><span class="p">)]</span>
     <span class="n">previous_block</span> <span class="o">=</span> <span class="n">iv</span>
     <span class="n">ciphertext</span> <span class="o">=</span> <span class="s">""</span>
@@ -209,7 +154,7 @@
 </span>    <span class="k">return</span> <span class="n">iv</span><span class="p">,</span> <span class="n">ciphertext</span>
     
 <span class="k">def</span> <span class="nf">pad</span><span class="p">(</span><span class="n">block_size</span><span class="p">,</span> <span class="n">plaintext</span><span class="p">):</span>
-    <span class="c1"># pads the plaintext with X's until the length is a multiple of `block_size`
+    <span class="c1"># pads the plaintext with X's until the length is a multiple of block_size
 </span>    <span class="n">plaintext</span> <span class="o">+=</span> <span class="s">"X"</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">plaintext</span><span class="p">)</span> <span class="o">%</span> <span class="n">block_size</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">plaintext</span>
 
@@ -229,6 +174,15 @@
 ciphertext = WYZCAZIXERPEDAJTTMZRCHVVOIEWJXCFMCGHDHKDDMQWDKVRVCCAWNHOWDXHTUTCXPGLDXVQXEIESEITZUQIYHTTZJWKZVUTXKCHLWOCFWGVRQMPFILDXIULREEPMOWJFYGZJFYYFNMRCQWUEZQSOWYITZTWJVMWEACAQJKJLBMOWNSWSMRWCSFZDCOWIUZYNSDCUAXEYYFTRGFMTSVKZMHKSOTOULOGOLGMGRMOVGLTDDIOWBNILNADKNBQRMHXFMGUBLOWUNECFVALJGRYMLEHDMPYDQMRNDFZKCYBFGPMJUZFECEQKMAJYUOJVEBJMCHMSVOTNDXREBMIYNGEFCGPTIMWZVTHHQHANYEWVCJNYTCJKCNRCLEHROHKCORLATGHSKIE
 </code></pre></div></div>
 
+<div id="puzzleId" hidden="">3</div>
+<script src="/supersecretweekly/assets/js/puzzleutil.js"></script>
+
+<script>initialize()</script>
+
+
+
+<script async src="/supersecretweekly/assets/js/puzzleutil.js"></script>
+<script async src="/supersecretweekly/assets/js/puzzletexts.js"></script>
 
 </article>
 
