@@ -11,9 +11,6 @@ function checkURL(url) {
 function updateText(responseText, answer="", answerURL=""){
     textResponse = document.getElementById("responsetext")
     response = responseText.split("\n")[0].trim()
-    console.log(responseText)
-    console.log(response)
-    console.log(response == "correct!")
     switch(response){
     case "correct!!":
         window.location = answerURL.slice(0, -5) + "/success.html";
@@ -82,7 +79,11 @@ function loadPuzzleToken(){
 }
 
 function getPuzzleId(){
-    return document.getElementById("puzzleId").innerHTML
+    try {
+        return document.getElementById("puzzleId").innerHTML
+    } catch {
+        return 0
+    }
 }
 
 function setPuzzleAnswer(puzzleID, answer, keyFrag){
@@ -99,7 +100,7 @@ function setPuzzleToken(puzzleToken){
 function checkSubmitted(){
     puzzleID = getPuzzleId();
     token = loadPuzzleToken();
-    if (token[puzzleID] != undefined){
+    if (token[puzzleID] != undefined && puzzleID != 0){
         editPuzzleAnswer(token[puzzleID][0])
     }
 }

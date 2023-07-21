@@ -99,39 +99,84 @@
 
 <p>a few notes before you begin:</p>
 
+<h3 id="about-the-weekly">about the weekly</h3>
+
 <ul>
   <li>
-    <p>the entire weekly is contained within the <code class="language-plaintext highlighter-rouge">/supersecretweekly/</code> directory.</p>
+    <p>the weekly is all contained within the <code class="language-plaintext highlighter-rouge">/supersecretweekly/</code> directory.</p>
   </li>
   <li>
-    <p>each puzzle page has a check answer box at the top of the page. answers will consist of only letters, and case does not matter (only letters are checked either way)</p>
+    <p>no files are hidden (i.e. you do not need to change the url yourself to access a part of the puzzle)</p>
   </li>
   <li>
-    <p>some puzzles have checks for intermediary answers. they may also give slight clarification on what to do with them.</p>
-  </li>
-  <li>
-    <p>this check answer page has a small proof-of-work that will be completed automatically upon pressing the check answer button. this means that each answer will take a few seconds to be checked.</p>
-  </li>
-  <li>
-    <p>this weekly is partially quite technical. about half of the puzzles consist of a python script with the output of running the script, where you must try and recover the <code class="language-plaintext highlighter-rouge">SECRET_MESSAGE</code> in each case. you can use <a href="https://www.online-python.com">https://www.online-python.com</a> to run them if you want. these puzzles are marked as <code class="language-plaintext highlighter-rouge">technical</code>, while ordinary puzzles are marked with <code class="language-plaintext highlighter-rouge">puzzle</code>.</p>
-  </li>
-  <li>
-    <p>to make this weekly more accessible, a few of the technical puzzles have slightly easier versions of them, which act as a stepping stone to solving the actual one. note that <strong>these puzzles are completely optional and their answers do not contribute to the metapuzzle</strong>.</p>
-  </li>
-  <li>
-    <p>no coding is strictly required to solve the technical puzzles, however it may help speed up the solving process.</p>
-  </li>
-  <li>
-    <p>no files are hidden (i.e. you do not need to change the url to access a part of the puzzle)</p>
+    <p>nothing is hidden in any file given (i.e. you do not need to look at exif etc.)</p>
   </li>
   <li>
     <p>random hex strings, when used as filenames are <strong>not important</strong> and are not part of puzzles.</p>
   </li>
   <li>
-    <p>there is a metapuzzle at the bottom of the puzzles list. this puzzle is designed to be solved last, and requires the <strong>answers</strong> of all the other puzzles (although you don’t necessarily need all of the answers to solve it!) (but it is advised to have a majority of the answers before attempting it)</p>
+    <p>the weekly is non-linear (i.e. you can do puzzles in any order you like, however the metapuzzle will be the last thing you solve before completion)</p>
+  </li>
+</ul>
+
+<h3 id="about-the-puzzles">about the puzzles</h3>
+
+<ul>
+  <li>
+    <p>each puzzle page has a check answer box at the top of the page. answers will consist of only letters in the english alphabet, and case does not matter (only letters are checked either way). each answer will take a few seconds to check.</p>
   </li>
   <li>
-    <p>this is not a puzzle</p>
+    <p>some puzzles have checks for intermediary answers. if you have something, submit it and see if it’s correct!</p>
+  </li>
+  <li>
+    <p>puzzles will also mostly have copy to clipboard buttons, which copies all the content of the puzzle for pasting in google sheets, etc.</p>
+  </li>
+  <li>
+    <p>puzzles will save correct answers using localstorage, and can be accessed by viewing the page of a solved puzzle.</p>
+  </li>
+</ul>
+
+<h3 id="about-the-technicals">about the technicals</h3>
+
+<ul>
+  <li>
+    <p>this weekly is partially quite technical. the puzzles consist of a python script with the output of running the script, where you must try and recover the <code class="language-plaintext highlighter-rouge">SECRET_MESSAGE</code> in each case. you can use <a href="https://www.online-python.com">https://www.online-python.com</a> to run them if you want. these puzzles are marked as <code class="language-plaintext highlighter-rouge">technical</code>, while ordinary puzzles are marked with <code class="language-plaintext highlighter-rouge">puzzle</code>.</p>
+  </li>
+  <li>
+    <p>to make this weekly more accessible, most of the technical puzzles have slightly easier versions of them, which act as a stepping stone to solving the actual one. note that <strong>these puzzles are completely optional and their answers do not contribute to the metapuzzle</strong>.</p>
+  </li>
+  <li>
+    <p>no coding is <em>strictly</em> required to solve the technical puzzles, however it may help speed up the solving process greatly.</p>
+  </li>
+</ul>
+
+<h3 id="about-the-meta">about the meta</h3>
+
+<ul>
+  <li>
+    <p>there is a metapuzzle. the metapuzzle will be initally unlocked when you have at least 7 solves (this will be done automatically)</p>
+  </li>
+  <li>
+    <p>the metapuzzle will change slightly based on how many solves you have. the more solves you have, the easier it will be (not only because you have more answers, but slightly more hints will be revealed).</p>
+  </li>
+  <li>
+    <p>only solving the metapuzzle is required to complete the weekly (but i highly encourage you to solve everything if you have the time)</p>
+  </li>
+  <li>
+    <p>the metapuzzle will use the <strong>answers</strong> from the 10 main puzzles</p>
+  </li>
+</ul>
+
+<h3 id="other-stuff">other stuff</h3>
+<ul>
+  <li>
+    <p>please don’t tamper with localstorage as you might break something (and it won’t help you anyway)</p>
+  </li>
+  <li>
+    <p>this page is not a puzzle</p>
+  </li>
+  <li>
+    <p>special thanks to ronald_d_d and rafa for vetting + all the feedback and improvements, and weaver for meta + generic pen and paper puzzle images, as well as website colour choices</p>
   </li>
   <li>
     <p>go <strong><a href="/supersecretweekly/">here</a></strong> to begin!!</p>
