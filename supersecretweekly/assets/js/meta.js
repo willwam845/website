@@ -46,7 +46,9 @@ async function tryKey(key){
 
 function disallowMeta(keynum){
     metaBody = document.getElementById("metadiv")
-    if (keynum < 7){
+    if (keynum == 6) {
+        metaBody.innerHTML = `<h3>sorry, you can't see the meta until you have solved ${7 - keynum} more puzzle</h3>`
+    } else if (keynum < 7){
         metaBody.innerHTML = `<h3>sorry, you can't see the meta until you have solved ${7 - keynum} more puzzles</h3>`
     } else {
         metaBody.innerHTML = "<h3>hmm, you seem to have broken something :v</h3>\n<h3>your progress has been reset in an attempt to fix it</h3>"

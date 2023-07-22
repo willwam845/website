@@ -132,7 +132,7 @@
 </span><span class="n">modulus</span> <span class="o">=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span> <span class="c1"># multiply them together
 </span><span class="n">exponent</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="k">print</span><span class="p">(</span><span class="n">modulus</span><span class="p">)</span>
-<span class="k">print</span><span class="p">((</span><span class="n">bytes_to_long</span><span class="p">(</span><span class="n">SECRET_MESSAGE</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulus</span><span class="p">)</span> <span class="c1"># encrypt using RSA, by doing pt raised to the power of exponent (3) modulo the modulus
+<span class="k">print</span><span class="p">((</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">SECRET_MESSAGE</span><span class="p">)</span> <span class="o">**</span> <span class="n">exponent</span><span class="p">)</span> <span class="o">%</span> <span class="n">modulus</span><span class="p">)</span> <span class="c1"># encrypt using RSA, by doing pt raised to the power of exponent (3) modulo the modulus
 </span></code></pre></div></div>
 
 <h5 id="output">Output:</h5>
